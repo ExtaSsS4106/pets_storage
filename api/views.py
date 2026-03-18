@@ -97,13 +97,13 @@ def add(request):
                     expiry_date = np.get('expiry_date')
                     delivery_date = np.get('delivery_date')
                     if name and manufacturer and category_id and animal_type_id and expiry_date and delivery_date:
-                        product = Products_in_storage.objects.create(Name=name, Manufacturer=manufacturer, Category_ID=category_id, Animal_Type_ID=animal_type_id, Expiry_Date=expiry_date, Delivery_Date=delivery_date)
+                        product = Products_in_storage.objects.create(Name=name, Manufacturer=manufacturer, Category_ID_id=category_id, Animal_Type_ID_id=animal_type_id, Expiry_Date=expiry_date, Delivery_Date=delivery_date)
                         Item_Movements.objects.create(Products_in_storage_ID=product, Action='adding', Employee_ID=Employees.objects.get(user=request.user))
                     else:
                         errors.append(np)
                         print(np, "not added")
                 response = {
-                    "errors_count": errors.count(),
+                    "errors_count": len(errors) ,
                     "list": errors,
                     "status": "not added"                    
                 }
@@ -145,7 +145,7 @@ def delete(request):
                 else:
                     errors.append(p)
             response = {
-                "errors_count": errors.count(),
+                "errors_count": len(errors),
                 "list": errors,
                 "status": "not added"                    
             }
