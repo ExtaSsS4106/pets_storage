@@ -407,100 +407,106 @@
             </div>
         </section>
 
-        <!-- Товары -->
+               <!-- Товары (ОБНОВЛЕНО) -->
         <section class="section">
             <div class="section-title">
                 <span class="section-icon">📦</span>
                 <h2>Товары</h2>
             </div>
 
-            <!-- Получить все товары -->
+            <!-- Получить все товары (ГРУППИРОВКА) -->
             <div class="endpoint">
                 <span class="method method-get">GET</span>
                 <span class="endpoint-url">/select_all</span>
                 <span class="badge badge-auth">🔒 Требуется токен</span>
-                <div class="description">Получить список всех товаров на складе</div>
+                <span class="new-badge">ОБНОВЛЕНО</span>
+                <div class="description">Получить список всех товаров на складе с группировкой по названию, производителю, категории, типу животного и сроку годности</div>
 
                 <h4>✅ Успешный ответ (200):</h4>
                 <div class="response-success">
                     <pre>{
     "data": {
-        "status": "all_products",
+        "status": "all_products_grouped",
         "data": [
             {
-                "id": 1,
                 "name": "Вискас с курицей",
                 "manufacturer": "Mars",
                 "category": "wet",
                 "animal_type": "cats",
                 "expiry_date": "2025-12-31",
                 "delivery_date": "2024-03-17",
+                "total_quantity": 10,
+                "active_quantity": 8,
+                "deleted_quantity": 2,
                 "status": "active"
             }
         ]
     }
 }</pre>
                 </div>
+                <p><strong>🔍 Что изменилось:</strong> Теперь товары группируются по одинаковым позициям. Вместо отдельных записей для каждой единицы товара, вы получаете одну запись с указанием общего количества, количества активных и списанных.</p>
             </div>
 
-            <!-- Просроченные товары -->
+                        <!-- Просроченные товары (ОБНОВЛЕНО) -->
             <div class="endpoint">
                 <span class="method method-get">GET</span>
                 <span class="endpoint-url">/select_expired</span>
                 <span class="badge badge-auth">🔒 Требуется токен</span>
-                <span class="new-badge">NEW</span>
-                <div class="description">Получить список просроченных товаров (Expiry_Date &lt; сегодня, Status='exists')</div>
+                <span class="new-badge">ОБНОВЛЕНО</span>
+                <div class="description">Получить список просроченных товаров с группировкой</div>
 
                 <h4>✅ Успешный ответ (200):</h4>
                 <div class="response-success">
                     <pre>{
     "data": {
-        "status": "expired_products",
+        "status": "expired_products_grouped",
         "data": [
             {
-                "id": 5,
                 "name": "Корм для собак",
                 "manufacturer": "Purina",
                 "category": "dry",
                 "animal_type": "dogs",
                 "expiry_date": "2024-01-15",
                 "delivery_date": "2023-12-01",
-                "status": "exists"
+                "quantity": 5,
+                "status": "expired"
             }
         ]
     }
 }</pre>
                 </div>
+                <p><strong>🔍 Что изменилось:</strong> Просроченные товары теперь группируются по одинаковым позициям с указанием общего количества просроченных единиц.</p>
             </div>
 
-            <!-- Списанные товары -->
+             <!-- Списанные товары (ОБНОВЛЕНО) -->
             <div class="endpoint">
                 <span class="method method-get">GET</span>
                 <span class="endpoint-url">/select_deleted</span>
                 <span class="badge badge-auth">🔒 Требуется токен</span>
-                <span class="new-badge">NEW</span>
-                <div class="description">Получить список списанных товаров (Status='deleted')</div>
+                <span class="new-badge">ОБНОВЛЕНО</span>
+                <div class="description">Получить список списанных товаров с группировкой</div>
 
                 <h4>✅ Успешный ответ (200):</h4>
                 <div class="response-success">
                     <pre>{
     "data": {
-        "status": "deleted_products",
+        "status": "deleted_products_grouped",
         "data": [
             {
-                "id": 3,
                 "name": "Лакомство для кошек",
                 "manufacturer": "Whiskas",
                 "category": "treats",
                 "animal_type": "cats",
                 "expiry_date": "2023-12-31",
                 "delivery_date": "2023-10-15",
+                "quantity": 3,
                 "status": "deleted"
             }
         ]
     }
 }</pre>
                 </div>
+                <p><strong>🔍 Что изменилось:</strong> Списанные товары теперь группируются по одинаковым позициям с указанием общего количества списанных единиц.</p>
             </div>
 
             <!-- Добавить товары -->
@@ -883,6 +889,13 @@
                 <li style="margin-bottom: 1rem; padding: 1rem; background: #f8fafc; border-radius: 10px;">
                     <strong>🆕 6. Новые эндпоинты:</strong><br>
                     Добавлена фильтрация товаров (просроченные/списанные), движений по типу и сотрудников по должности
+                </li>
+                <li style="margin-bottom: 1rem; padding: 1rem; background: #f8fafc; border-radius: 10px; border-left: 4px solid #49cc90;">
+                    <strong>📊 7. Группировка товаров (НОВОЕ!):</strong><br>
+                    Все GET запросы для товаров теперь возвращают сгруппированные данные:<br>
+                    - <strong>/select_all</strong> - возвращает <code>total_quantity</code>, <code>active_quantity</code>, <code>deleted_quantity</code><br>
+                    - <strong>/select_expired</strong> и <strong>/select_deleted</strong> - возвращают <code>quantity</code><br>
+                    Это позволяет видеть общее количество одинаковых позиций на складе.
                 </li>
             </ul>
         </section>
