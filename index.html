@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Pet Storage API Documentation</title>
     <style>
         * {
@@ -16,6 +16,125 @@
             background-color: #f5f7fb;
             color: #1e293b;
             line-height: 1.6;
+        }
+
+        /* Навигация */
+        .nav-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 280px;
+            background: white;
+            box-shadow: 2px 0 20px rgba(0,0,0,0.1);
+            padding: 2rem 1rem;
+            overflow-y: auto;
+            z-index: 100;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-container.hidden {
+            transform: translateX(-100%);
+        }
+
+        .nav-toggle {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 101;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            width: 50px;
+            height: 50px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.4);
+        }
+
+        .nav-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1e293b;
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 1rem;
+            color: #475569;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            background: #f1f5f9;
+            color: #667eea;
+        }
+
+        .nav-link.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .nav-icon {
+            margin-right: 0.8rem;
+            font-size: 1.2rem;
+        }
+
+        .nav-submenu {
+            list-style: none;
+            padding-left: 2.5rem;
+            margin-top: 0.3rem;
+        }
+
+        .nav-subitem {
+            margin-bottom: 0.3rem;
+        }
+
+        .nav-sublink {
+            display: block;
+            padding: 0.5rem 1rem;
+            color: #64748b;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .nav-sublink:hover {
+            background: #f1f5f9;
+            color: #667eea;
+        }
+
+        /* Основной контент */
+        .main-content {
+            margin-left: 280px;
+            transition: margin-left 0.3s ease;
+        }
+
+        .main-content.expanded {
+            margin-left: 0;
         }
 
         .container {
@@ -60,6 +179,7 @@
             padding: 2rem;
             margin-bottom: 2rem;
             box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            scroll-margin-top: 1rem;
         }
 
         .section-title {
@@ -88,6 +208,7 @@
             margin-bottom: 1.5rem;
             border-radius: 10px;
             transition: transform 0.2s;
+            scroll-margin-top: 1rem;
         }
 
         .endpoint:hover {
@@ -124,6 +245,7 @@
             font-size: 1.2rem;
             font-weight: 600;
             color: #1e293b;
+            word-break: break-word;
         }
 
         .badge {
@@ -163,12 +285,15 @@
         .request-box pre {
             margin: 0;
             white-space: pre-wrap;
+            word-break: break-word;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
             margin: 1rem 0;
+            overflow-x: auto;
+            display: block;
         }
 
         th {
@@ -201,6 +326,7 @@
             background: #f0fdf4;
             padding: 1rem;
             margin: 1rem 0;
+            overflow-x: auto;
         }
 
         .response-error {
@@ -208,6 +334,7 @@
             background: #fef2f2;
             padding: 1rem;
             margin: 1rem 0;
+            overflow-x: auto;
         }
 
         .footer {
@@ -231,46 +358,211 @@
             border-radius: 3px;
             margin-left: 0.5rem;
             vertical-align: middle;
+            white-space: nowrap;
         }
 
+        /* Адаптация для мобильных */
         @media (max-width: 768px) {
+            .nav-toggle {
+                display: flex;
+            }
+
+            .nav-container {
+                transform: translateX(-100%);
+                width: 85%;
+                max-width: 300px;
+            }
+
+            .nav-container.visible {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            header {
+                padding: 1.5rem;
+                margin-top: 3rem;
+            }
+
+            header h1 {
+                font-size: 1.8rem;
+            }
+
+            .base-url {
+                font-size: 0.9rem;
+                padding: 0.6rem 1rem;
+                word-break: break-all;
+            }
+
+            .section {
+                padding: 1rem;
+            }
+
+            .section-title h2 {
+                font-size: 1.5rem;
+            }
+
+            .endpoint {
+                padding: 1rem;
+            }
+
+            .method {
+                display: inline-block;
+                margin-bottom: 0.5rem;
+            }
+
+            .endpoint-url {
+                display: inline-block;
+                margin-bottom: 0.5rem;
+                font-size: 1rem;
+            }
+
+            .badge {
+                display: inline-block;
+                margin: 0.25rem;
+            }
+
             .grid-2 {
                 grid-template-columns: 1fr;
+            }
+
+            .request-box pre {
+                font-size: 0.85rem;
+            }
+
+            table {
+                font-size: 0.85rem;
+            }
+
+            th, td {
+                padding: 0.5rem;
+            }
+        }
+
+        /* Для очень маленьких экранов */
+        @media (max-width: 480px) {
+            .method {
+                font-size: 0.8rem;
+                padding: 0.2rem 0.6rem;
+            }
+
+            .endpoint-url {
+                font-size: 0.9rem;
+            }
+
+            .badge {
+                font-size: 0.7rem;
+            }
+
+            .response-success pre,
+            .response-error pre {
+                font-size: 0.75rem;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>🐾 Pet Storage API Documentation</h1>
-            <p>Система учета товаров для зоомагазина / склада</p>
-            <div class="base-url">
-                📍 Базовый URL: http://127.0.0.1:8000
-            </div>
-        </header>
+    <!-- Кнопка меню -->
+    <button class="nav-toggle" id="navToggle">☰</button>
 
-        <!-- Аутентификация -->
-        <section class="section">
-            <div class="section-title">
-                <span class="section-icon">🔐</span>
-                <h2>Аутентификация</h2>
-            </div>
-            <p style="margin-bottom: 1rem;">API использует <strong>Token Authentication</strong>. После успешного входа/регистрации вы получаете токен, который нужно передавать в заголовке каждого запроса:</p>
-            <div class="request-box">
-                <pre>Authorization: Token &lt;your_token_key&gt;</pre>
-            </div>
+    <!-- Навигация -->
+    <div class="nav-container" id="navContainer">
+        <div class="nav-title">
+            <span>📚</span> Содержание
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="#auth" class="nav-link" onclick="closeNav()">
+                    <span class="nav-icon">🔐</span> Аутентификация
+                </a>
+                <ul class="nav-submenu">
+                    <li class="nav-subitem"><a href="#sign_up" class="nav-sublink" onclick="closeNav()">Регистрация</a></li>
+                    <li class="nav-subitem"><a href="#login" class="nav-sublink" onclick="closeNav()">Вход</a></li>
+                    <li class="nav-subitem"><a href="#logout" class="nav-sublink" onclick="closeNav()">Выход</a></li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a href="#products" class="nav-link" onclick="closeNav()">
+                    <span class="nav-icon">📦</span> Товары
+                </a>
+                <ul class="nav-submenu">
+                    <li class="nav-subitem"><a href="#select_all" class="nav-sublink" onclick="closeNav()">Все товары</a></li>
+                    <li class="nav-subitem"><a href="#select_expired" class="nav-sublink" onclick="closeNav()">Просроченные</a></li>
+                    <li class="nav-subitem"><a href="#select_deleted" class="nav-sublink" onclick="closeNav()">Списанные</a></li>
+                    <li class="nav-subitem"><a href="#add" class="nav-sublink" onclick="closeNav()">Добавить</a></li>
+                    <li class="nav-subitem"><a href="#delete" class="nav-sublink" onclick="closeNav()">Удалить</a></li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a href="#movements" class="nav-link" onclick="closeNav()">
+                    <span class="nav-icon">📊</span> Движения
+                </a>
+                <ul class="nav-submenu">
+                    <li class="nav-subitem"><a href="#all_movments" class="nav-sublink" onclick="closeNav()">Все движения</a></li>
+                    <li class="nav-subitem"><a href="#movements_by_action" class="nav-sublink" onclick="closeNav()">По типу</a></li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a href="#employees" class="nav-link" onclick="closeNav()">
+                    <span class="nav-icon">👥</span> Сотрудники
+                </a>
+                <ul class="nav-submenu">
+                    <li class="nav-subitem"><a href="#all_employees" class="nav-sublink" onclick="closeNav()">Все сотрудники</a></li>
+                    <li class="nav-subitem"><a href="#employees_by_position" class="nav-sublink" onclick="closeNav()">По должности</a></li>
+                    <li class="nav-subitem"><a href="#delete_employees" class="nav-sublink" onclick="closeNav()">Удалить</a></li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a href="#errors" class="nav-link" onclick="closeNav()">
+                    <span class="nav-icon">⚠️</span> Коды ошибок
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#notes" class="nav-link" onclick="closeNav()">
+                    <span class="nav-icon">📝</span> Примечания
+                </a>
+            </li>
+        </ul>
+    </div>
 
-            <!-- Регистрация -->
-            <div class="endpoint">
-                <span class="method method-post">POST</span>
-                <span class="endpoint-url">/sign_up</span>
-                <span class="badge">Регистрация</span>
-                <div class="description">Создает нового пользователя и сотрудника</div>
-                
-                <h4>📥 Request Body:</h4>
+    <!-- Основной контент -->
+    <div class="main-content" id="mainContent">
+        <div class="container">
+            <header>
+                <h1>🐾 Pet Storage API Documentation</h1>
+                <p>Система учета товаров для зоомагазина / склада</p>
+                <div class="base-url">
+                    📍 Базовый URL: http://127.0.0.1:8000
+                </div>
+            </header>
+
+            <!-- Аутентификация -->
+            <section id="auth" class="section">
+                <div class="section-title">
+                    <span class="section-icon">🔐</span>
+                    <h2>Аутентификация</h2>
+                </div>
+                <p style="margin-bottom: 1rem;">API использует <strong>Token Authentication</strong>. После успешного входа/регистрации вы получаете токен, который нужно передавать в заголовке каждого запроса:</p>
                 <div class="request-box">
-                    <pre>{
+                    <pre>Authorization: Token &lt;your_token_key&gt;</pre>
+                </div>
+
+                <!-- Регистрация -->
+                <div id="sign_up" class="endpoint">
+                    <span class="method method-post">POST</span>
+                    <span class="endpoint-url">/sign_up</span>
+                    <span class="badge">Регистрация</span>
+                    <div class="description">Создает нового пользователя и сотрудника</div>
+                    
+                    <h4>📥 Request Body:</h4>
+                    <div class="request-box">
+                        <pre>{
     "full_name": "Иван Петров",
     "email": "ivan@example.com",
     "password1": "securepass123",
@@ -279,152 +571,152 @@
     "phone_number": "+1234567890",
     "position_id": 1
 }</pre>
-                </div>
+                    </div>
 
-                <h4>📋 Параметры:</h4>
-                <table>
-                    <tr>
-                        <th>Поле</th>
-                        <th>Тип</th>
-                        <th>Обязательность</th>
-                        <th>Описание</th>
-                    </tr>
-                    <tr>
-                        <td>full_name</td>
-                        <td>string</td>
-                        <td class="param-required">✅ Да</td>
-                        <td>Полное имя сотрудника</td>
-                    </tr>
-                    <tr>
-                        <td>email</td>
-                        <td>string</td>
-                        <td class="param-required">✅ Да</td>
-                        <td>Email (уникальный)</td>
-                    </tr>
-                    <tr>
-                        <td>password1</td>
-                        <td>string</td>
-                        <td class="param-required">✅ Да</td>
-                        <td>Пароль</td>
-                    </tr>
-                    <tr>
-                        <td>password2</td>
-                        <td>string</td>
-                        <td class="param-required">✅ Да</td>
-                        <td>Подтверждение пароля</td>
-                    </tr>
-                    <tr>
-                        <td>date_of_birth</td>
-                        <td>date</td>
-                        <td class="param-required">✅ Да</td>
-                        <td>Дата рождения (YYYY-MM-DD)</td>
-                    </tr>
-                    <tr>
-                        <td>phone_number</td>
-                        <td>string</td>
-                        <td class="param-required">✅ Да</td>
-                        <td>Номер телефона</td>
-                    </tr>
-                    <tr>
-                        <td>position_id</td>
-                        <td>integer</td>
-                        <td class="param-required">✅ Да</td>
-                        <td>1 - Administrator, 2 - Warehouse_Operator</td>
-                    </tr>
-                </table>
+                    <h4>📋 Параметры:</h4>
+                    <table>
+                        <tr>
+                            <th>Поле</th>
+                            <th>Тип</th>
+                            <th>Обязательность</th>
+                            <th>Описание</th>
+                        </tr>
+                        <tr>
+                            <td>full_name</td>
+                            <td>string</td>
+                            <td class="param-required">✅ Да</td>
+                            <td>Полное имя сотрудника</td>
+                        </tr>
+                        <tr>
+                            <td>email</td>
+                            <td>string</td>
+                            <td class="param-required">✅ Да</td>
+                            <td>Email (уникальный)</td>
+                        </tr>
+                        <tr>
+                            <td>password1</td>
+                            <td>string</td>
+                            <td class="param-required">✅ Да</td>
+                            <td>Пароль</td>
+                        </tr>
+                        <tr>
+                            <td>password2</td>
+                            <td>string</td>
+                            <td class="param-required">✅ Да</td>
+                            <td>Подтверждение пароля</td>
+                        </tr>
+                        <tr>
+                            <td>date_of_birth</td>
+                            <td>date</td>
+                            <td class="param-required">✅ Да</td>
+                            <td>Дата рождения (YYYY-MM-DD)</td>
+                        </tr>
+                        <tr>
+                            <td>phone_number</td>
+                            <td>string</td>
+                            <td class="param-required">✅ Да</td>
+                            <td>Номер телефона</td>
+                        </tr>
+                        <tr>
+                            <td>position_id</td>
+                            <td>integer</td>
+                            <td class="param-required">✅ Да</td>
+                            <td>1 - Administrator, 2 - Warehouse_Operator</td>
+                        </tr>
+                    </table>
 
-                <h4>✅ Успешный ответ (200):</h4>
-                <div class="response-success">
-                    <pre>{
+                    <h4>✅ Успешный ответ (200):</h4>
+                    <div class="response-success">
+                        <pre>{
     "token": "9944b09199c62bcf9418ad846dd0e4bbdfc6ee4b",
     "user": {
         "full_name": "Иван Петров",
         "email": "ivan@example.com"
     }
 }</pre>
-                </div>
+                    </div>
 
-                <h4>❌ Ошибка (400):</h4>
-                <div class="response-error">
-                    <pre>{
+                    <h4>❌ Ошибка (400):</h4>
+                    <div class="response-error">
+                        <pre>{
     "password2": ["Пароли не совпадают"],
     "email": ["Сотрудник с таким email уже существует"]
 }</pre>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Вход -->
-            <div class="endpoint">
-                <span class="method method-post">POST</span>
-                <span class="endpoint-url">/login</span>
-                <span class="badge">Вход</span>
-                <div class="description">Авторизация пользователя</div>
-                
-                <div class="request-box">
-                    <pre>{
+                <!-- Вход -->
+                <div id="login" class="endpoint">
+                    <span class="method method-post">POST</span>
+                    <span class="endpoint-url">/login</span>
+                    <span class="badge">Вход</span>
+                    <div class="description">Авторизация пользователя</div>
+                    
+                    <div class="request-box">
+                        <pre>{
     "email": "ivan@example.com",
     "password": "securepass123"
 }</pre>
-                </div>
+                    </div>
 
-                <h4>✅ Успешный ответ (200):</h4>
-                <div class="response-success">
-                    <pre>{
+                    <h4>✅ Успешный ответ (200):</h4>
+                    <div class="response-success">
+                        <pre>{
     "token": "9944b09199c62bcf9418ad846dd0e4bbdfc6ee4b",
     "user": {
         "full_name": "Иван Петров",
         "email": "ivan@example.com"
     }
 }</pre>
-                </div>
+                    </div>
 
-                <h4>❌ Ошибка (404):</h4>
-                <div class="response-error">
-                    <pre>{
+                    <h4>❌ Ошибка (404):</h4>
+                    <div class="response-error">
+                        <pre>{
     "detail": "wrong password"
 }</pre>
-                </div>
-            </div>
-
-            <!-- Выход -->
-            <div class="endpoint">
-                <span class="method method-post">POST</span>
-                <span class="endpoint-url">/logout</span>
-                <span class="badge badge-auth">🔒 Требуется токен</span>
-                <div class="description">Выход из системы (удаление токена)</div>
-                
-                <h4>📤 Headers:</h4>
-                <div class="request-box">
-                    <pre>Authorization: Token 9944b09199c62bcf9418ad846dd0e4bbdfc6ee4b</pre>
+                    </div>
                 </div>
 
-                <h4>✅ Успешный ответ (200):</h4>
-                <div class="response-success">
-                    <pre>{
+                <!-- Выход -->
+                <div id="logout" class="endpoint">
+                    <span class="method method-post">POST</span>
+                    <span class="endpoint-url">/logout</span>
+                    <span class="badge badge-auth">🔒 Требуется токен</span>
+                    <div class="description">Выход из системы (удаление токена)</div>
+                    
+                    <h4>📤 Headers:</h4>
+                    <div class="request-box">
+                        <pre>Authorization: Token 9944b09199c62bcf9418ad846dd0e4bbdfc6ee4b</pre>
+                    </div>
+
+                    <h4>✅ Успешный ответ (200):</h4>
+                    <div class="response-success">
+                        <pre>{
     "detail": "Успешный выход"
 }</pre>
+                    </div>
                 </div>
-            </div>
-        </section>
+            </section>
 
-               <!-- Товары (ОБНОВЛЕНО) -->
-        <section class="section">
-            <div class="section-title">
-                <span class="section-icon">📦</span>
-                <h2>Товары</h2>
-            </div>
+            <!-- Товары (ОБНОВЛЕНО) -->
+            <section id="products" class="section">
+                <div class="section-title">
+                    <span class="section-icon">📦</span>
+                    <h2>Товары</h2>
+                </div>
 
-            <!-- Получить все товары (ГРУППИРОВКА) -->
-            <div class="endpoint">
-                <span class="method method-get">GET</span>
-                <span class="endpoint-url">/select_all</span>
-                <span class="badge badge-auth">🔒 Требуется токен</span>
-                <span class="new-badge">ОБНОВЛЕНО</span>
-                <div class="description">Получить список всех товаров на складе с группировкой по названию, производителю, категории, типу животного и сроку годности</div>
+                <!-- Получить все товары (ГРУППИРОВКА) -->
+                <div id="select_all" class="endpoint">
+                    <span class="method method-get">GET</span>
+                    <span class="endpoint-url">/select_all</span>
+                    <span class="badge badge-auth">🔒 Требуется токен</span>
+                    <span class="new-badge">ОБНОВЛЕНО</span>
+                    <div class="description">Получить список всех товаров на складе с группировкой по названию, производителю, категории, типу животного и сроку годности</div>
 
-                <h4>✅ Успешный ответ (200):</h4>
-                <div class="response-success">
-                    <pre>{
+                    <h4>✅ Успешный ответ (200):</h4>
+                    <div class="response-success">
+                        <pre>{
     "data": {
         "status": "all_products_grouped",
         "data": [
@@ -443,21 +735,21 @@
         ]
     }
 }</pre>
+                    </div>
+                    <p><strong>🔍 Что изменилось:</strong> Теперь товары группируются по одинаковым позициям. Вместо отдельных записей для каждой единицы товара, вы получаете одну запись с указанием общего количества, количества активных и списанных.</p>
                 </div>
-                <p><strong>🔍 Что изменилось:</strong> Теперь товары группируются по одинаковым позициям. Вместо отдельных записей для каждой единицы товара, вы получаете одну запись с указанием общего количества, количества активных и списанных.</p>
-            </div>
 
-                        <!-- Просроченные товары (ОБНОВЛЕНО) -->
-            <div class="endpoint">
-                <span class="method method-get">GET</span>
-                <span class="endpoint-url">/select_expired</span>
-                <span class="badge badge-auth">🔒 Требуется токен</span>
-                <span class="new-badge">ОБНОВЛЕНО</span>
-                <div class="description">Получить список просроченных товаров с группировкой</div>
+                <!-- Просроченные товары (ОБНОВЛЕНО) -->
+                <div id="select_expired" class="endpoint">
+                    <span class="method method-get">GET</span>
+                    <span class="endpoint-url">/select_expired</span>
+                    <span class="badge badge-auth">🔒 Требуется токен</span>
+                    <span class="new-badge">ОБНОВЛЕНО</span>
+                    <div class="description">Получить список просроченных товаров с группировкой</div>
 
-                <h4>✅ Успешный ответ (200):</h4>
-                <div class="response-success">
-                    <pre>{
+                    <h4>✅ Успешный ответ (200):</h4>
+                    <div class="response-success">
+                        <pre>{
     "data": {
         "status": "expired_products_grouped",
         "data": [
@@ -474,21 +766,21 @@
         ]
     }
 }</pre>
+                    </div>
+                    <p><strong>🔍 Что изменилось:</strong> Просроченные товары теперь группируются по одинаковым позициям с указанием общего количества просроченных единиц.</p>
                 </div>
-                <p><strong>🔍 Что изменилось:</strong> Просроченные товары теперь группируются по одинаковым позициям с указанием общего количества просроченных единиц.</p>
-            </div>
 
-             <!-- Списанные товары (ОБНОВЛЕНО) -->
-            <div class="endpoint">
-                <span class="method method-get">GET</span>
-                <span class="endpoint-url">/select_deleted</span>
-                <span class="badge badge-auth">🔒 Требуется токен</span>
-                <span class="new-badge">ОБНОВЛЕНО</span>
-                <div class="description">Получить список списанных товаров с группировкой</div>
+                <!-- Списанные товары (ОБНОВЛЕНО) -->
+                <div id="select_deleted" class="endpoint">
+                    <span class="method method-get">GET</span>
+                    <span class="endpoint-url">/select_deleted</span>
+                    <span class="badge badge-auth">🔒 Требуется токен</span>
+                    <span class="new-badge">ОБНОВЛЕНО</span>
+                    <div class="description">Получить список списанных товаров с группировкой</div>
 
-                <h4>✅ Успешный ответ (200):</h4>
-                <div class="response-success">
-                    <pre>{
+                    <h4>✅ Успешный ответ (200):</h4>
+                    <div class="response-success">
+                        <pre>{
     "data": {
         "status": "deleted_products_grouped",
         "data": [
@@ -505,19 +797,19 @@
         ]
     }
 }</pre>
+                    </div>
+                    <p><strong>🔍 Что изменилось:</strong> Списанные товары теперь группируются по одинаковым позициям с указанием общего количества списанных единиц.</p>
                 </div>
-                <p><strong>🔍 Что изменилось:</strong> Списанные товары теперь группируются по одинаковым позициям с указанием общего количества списанных единиц.</p>
-            </div>
 
-            <!-- Добавить товары -->
-            <div class="endpoint">
-                <span class="method method-post">POST</span>
-                <span class="endpoint-url">/add</span>
-                <span class="badge badge-auth">🔒 Требуется токен</span>
-                <div class="description">Добавить новые товары на склад</div>
+                <!-- Добавить товары -->
+                <div id="add" class="endpoint">
+                    <span class="method method-post">POST</span>
+                    <span class="endpoint-url">/add</span>
+                    <span class="badge badge-auth">🔒 Требуется токен</span>
+                    <div class="description">Добавить новые товары на склад</div>
 
-                <div class="request-box">
-                    <pre>{
+                    <div class="request-box">
+                        <pre>{
     "new_products": [
         {
             "name": "Вискас с курицей",
@@ -529,80 +821,80 @@
         }
     ]
 }</pre>
-                </div>
+                    </div>
 
-                <h4>📋 Параметры (category_id и animal_type_id):</h4>
-                <table>
-                    <tr>
-                        <th>ID</th>
-                        <th>Категория</th>
-                    </tr>
-                    <tr><td>1</td><td>dry</td></tr>
-                    <tr><td>2</td><td>wet</td></tr>
-                    <tr><td>3</td><td>treats</td></tr>
-                    <tr><td>4</td><td>hay</td></tr>
-                </table>
-                <table>
-                    <tr>
-                        <th>ID</th>
-                        <th>Тип животного</th>
-                    </tr>
-                    <tr><td>1</td><td>dogs</td></tr>
-                    <tr><td>2</td><td>cats</td></tr>
-                    <tr><td>3</td><td>rodents</td></tr>
-                </table>
+                    <h4>📋 Параметры (category_id и animal_type_id):</h4>
+                    <table>
+                        <tr>
+                            <th>ID</th>
+                            <th>Категория</th>
+                        </tr>
+                        <tr><td>1</td><td>dry</td></tr>
+                        <tr><td>2</td><td>wet</td></tr>
+                        <tr><td>3</td><td>treats</td></tr>
+                        <tr><td>4</td><td>hay</td></tr>
+                    </table>
+                    <table>
+                        <tr>
+                            <th>ID</th>
+                            <th>Тип животного</th>
+                        </tr>
+                        <tr><td>1</td><td>dogs</td></tr>
+                        <tr><td>2</td><td>cats</td></tr>
+                        <tr><td>3</td><td>rodents</td></tr>
+                    </table>
 
-                <h4>✅ Успешный ответ (200):</h4>
-                <div class="response-success">
-                    <pre>{
+                    <h4>✅ Успешный ответ (200):</h4>
+                    <div class="response-success">
+                        <pre>{
     "data": {
         "errors_count": 0,
         "list": [],
         "status": "not added"
     }
 }</pre>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Удалить товары -->
-            <div class="endpoint">
-                <span class="method method-post">POST</span>
-                <span class="endpoint-url">/delete</span>
-                <span class="badge badge-auth">🔒 Требуется токен</span>
-                <div class="description">Списание товаров (изменение статуса на "deleted")</div>
+                <!-- Удалить товары -->
+                <div id="delete" class="endpoint">
+                    <span class="method method-post">POST</span>
+                    <span class="endpoint-url">/delete</span>
+                    <span class="badge badge-auth">🔒 Требуется токен</span>
+                    <div class="description">Списание товаров (изменение статуса на "deleted")</div>
 
-                <div class="request-box">
-                    <pre>{
+                    <div class="request-box">
+                        <pre>{
     "products": [
         {"id": 1},
         {"id": 2},
         {"id": 3}
     ]
 }</pre>
-                </div>
+                    </div>
 
-                <h4>✅ Успешный ответ (200):</h4>
-                <div class="response-success">
-                    <pre>{
+                    <h4>✅ Успешный ответ (200):</h4>
+                    <div class="response-success">
+                        <pre>{
     "data": {
         "errors_count": 0,
         "list": [],
         "status": "not added"
     }
 }</pre>
+                    </div>
                 </div>
-            </div>
 
-            <!-- GET add - справочники -->
-            <div style="display: none;" class="endpoint">
-                <span class="method method-get">GET</span>
-                <span class="endpoint-url">/add</span>
-                <span class="badge badge-auth">🔒 Требуется токен</span>
-                <div class="description">Получить справочники категорий и типов животных</div>
+                <!-- GET add - справочники (скрыто) -->
+                <div style="display: none;" class="endpoint">
+                    <span class="method method-get">GET</span>
+                    <span class="endpoint-url">/add</span>
+                    <span class="badge badge-auth">🔒 Требуется токен</span>
+                    <div class="description">Получить справочники категорий и типов животных</div>
 
-                <h4>✅ Успешный ответ (200):</h4>
-                <div class="response-success">
-                    <pre>{
+                    <h4>✅ Успешный ответ (200):</h4>
+                    <div class="response-success">
+                        <pre>{
     "data": {
         "categories": [
             {"id": 1, "type": "dry"},
@@ -617,27 +909,27 @@
         ]
     }
 }</pre>
+                    </div>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <!-- Движения товаров -->
-        <section class="section">
-            <div class="section-title">
-                <span class="section-icon">📊</span>
-                <h2>Движения товаров</h2>
-            </div>
+            <!-- Движения товаров -->
+            <section id="movements" class="section">
+                <div class="section-title">
+                    <span class="section-icon">📊</span>
+                    <h2>Движения товаров</h2>
+                </div>
 
-            <!-- Все движения -->
-            <div class="endpoint">
-                <span class="method method-get">GET</span>
-                <span class="endpoint-url">/select_movment</span>
-                <span class="badge badge-auth">🔒 Требуется токен</span>
-                <div class="description">Получить историю всех движений товаров</div>
+                <!-- Все движения -->
+                <div id="all_movments" class="endpoint">
+                    <span class="method method-get">GET</span>
+                    <span class="endpoint-url">/select_movment</span>
+                    <span class="badge badge-auth">🔒 Требуется токен</span>
+                    <div class="description">Получить историю всех движений товаров</div>
 
-                <h4>✅ Успешный ответ (200):</h4>
-                <div class="response-success">
-                    <pre>{
+                    <h4>✅ Успешный ответ (200):</h4>
+                    <div class="response-success">
+                        <pre>{
     "data": {
         "status": "all_movments",
         "data": [
@@ -655,26 +947,26 @@
         ]
     }
 }</pre>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Движения по типу -->
-            <div class="endpoint">
-                <span class="method method-get">GET</span>
-                <span class="endpoint-url">/select_movment/&lt;str:action&gt;</span>
-                <span class="badge badge-auth">🔒 Требуется токен</span>
-                <span class="new-badge">NEW</span>
-                <div class="description">Получить движения по типу действия (adding, disposal)</div>
+                <!-- Движения по типу -->
+                <div id="movements_by_action" class="endpoint">
+                    <span class="method method-get">GET</span>
+                    <span class="endpoint-url">/select_movment/&lt;str:action&gt;</span>
+                    <span class="badge badge-auth">🔒 Требуется токен</span>
+                    <span class="new-badge">NEW</span>
+                    <div class="description">Получить движения по типу действия (adding, disposal)</div>
 
-                <h4>🔍 Примеры:</h4>
-                <ul style="margin-bottom: 1rem;">
-                    <li><code>/select_movment/adding</code> - только добавления</li>
-                    <li><code>/select_movment/disposal</code> - только списания</li>
-                </ul>
+                    <h4>🔍 Примеры:</h4>
+                    <ul style="margin-bottom: 1rem;">
+                        <li><code>/select_movment/adding</code> - только добавления</li>
+                        <li><code>/select_movment/disposal</code> - только списания</li>
+                    </ul>
 
-                <h4>✅ Успешный ответ (200):</h4>
-                <div class="response-success">
-                    <pre>{
+                    <h4>✅ Успешный ответ (200):</h4>
+                    <div class="response-success">
+                        <pre>{
     "data": {
         "status": "adding_movments",
         "data": [
@@ -692,27 +984,27 @@
         ]
     }
 }</pre>
+                    </div>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <!-- Сотрудники -->
-        <section class="section">
-            <div class="section-title">
-                <span class="section-icon">👥</span>
-                <h2>Сотрудники</h2>
-            </div>
+            <!-- Сотрудники -->
+            <section id="employees" class="section">
+                <div class="section-title">
+                    <span class="section-icon">👥</span>
+                    <h2>Сотрудники</h2>
+                </div>
 
-            <!-- Все сотрудники -->
-            <div class="endpoint">
-                <span class="method method-get">GET</span>
-                <span class="endpoint-url">/select_employees</span>
-                <span class="badge badge-auth">🔒 Требуется токен</span>
-                <div class="description">Получить список всех сотрудников</div>
+                <!-- Все сотрудники -->
+                <div id="all_employees" class="endpoint">
+                    <span class="method method-get">GET</span>
+                    <span class="endpoint-url">/select_employees</span>
+                    <span class="badge badge-auth">🔒 Требуется токен</span>
+                    <div class="description">Получить список всех сотрудников</div>
 
-                <h4>✅ Успешный ответ (200):</h4>
-                <div class="response-success">
-                    <pre>{
+                    <h4>✅ Успешный ответ (200):</h4>
+                    <div class="response-success">
+                        <pre>{
     "data": {
         "status": "all_employees",
         "data": [
@@ -728,26 +1020,26 @@
         ]
     }
 }</pre>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Сотрудники по должности -->
-            <div class="endpoint">
-                <span class="method method-get">GET</span>
-                <span class="endpoint-url">/select_employees/&lt;int:position_id&gt;</span>
-                <span class="badge badge-auth">🔒 Требуется токен</span>
-                <span class="new-badge">NEW</span>
-                <div class="description">Получить сотрудников по должности</div>
+                <!-- Сотрудники по должности -->
+                <div id="employees_by_position" class="endpoint">
+                    <span class="method method-get">GET</span>
+                    <span class="endpoint-url">/select_employees/&lt;int:position_id&gt;</span>
+                    <span class="badge badge-auth">🔒 Требуется токен</span>
+                    <span class="new-badge">NEW</span>
+                    <div class="description">Получить сотрудников по должности</div>
 
-                <h4>🔍 Примеры:</h4>
-                <ul style="margin-bottom: 1rem;">
-                    <li><code>/select_employees/1</code> - администраторы</li>
-                    <li><code>/select_employees/2</code> - кладовщики</li>
-                </ul>
+                    <h4>🔍 Примеры:</h4>
+                    <ul style="margin-bottom: 1rem;">
+                        <li><code>/select_employees/1</code> - администраторы</li>
+                        <li><code>/select_employees/2</code> - кладовщики</li>
+                    </ul>
 
-                <h4>✅ Успешный ответ (200):</h4>
-                <div class="response-success">
-                    <pre>{
+                    <h4>✅ Успешный ответ (200):</h4>
+                    <div class="response-success">
+                        <pre>{
     "data": {
         "status": "employees_position_1",
         "data": [
@@ -763,147 +1055,215 @@
         ]
     }
 }</pre>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Удалить сотрудника -->
-            <div class="endpoint">
-                <span class="method method-post">POST</span>
-                <span class="endpoint-url">/delete_employees</span>
-                <span class="badge badge-auth">🔒 Требуется токен</span>
-                <span class="badge badge-admin">👑 Только администратор</span>
-                <div class="description">Удалить сотрудника (только для администратора, position_id = 1)</div>
+                <!-- Удалить сотрудника -->
+                <div id="delete_employees" class="endpoint">
+                    <span class="method method-post">POST</span>
+                    <span class="endpoint-url">/delete_employees</span>
+                    <span class="badge badge-auth">🔒 Требуется токен</span>
+                    <span class="badge badge-admin">👑 Только администратор</span>
+                    <div class="description">Удалить сотрудника (только для администратора, position_id = 1)</div>
 
-                <div class="request-box">
-                    <pre>{
+                    <div class="request-box">
+                        <pre>{
     "uid": 5
 }</pre>
+                    </div>
+
+                    <h4>📋 Параметры:</h4>
+                    <table>
+                        <tr>
+                            <th>Поле</th>
+                            <th>Тип</th>
+                            <th>Обязательность</th>
+                            <th>Описание</th>
+                        </tr>
+                        <tr>
+                            <td>uid</td>
+                            <td>integer</td>
+                            <td class="param-required">✅ Да</td>
+                            <td>ID пользователя для удаления</td>
+                        </tr>
+                    </table>
+
+                    <h4>✅ Успешный ответ (200):</h4>
+                    <div class="response-success">
+                        <pre>{
+    "data": "user not found"
+}</pre>
+                    </div>
+
+                    <h4>❌ Ошибка доступа (200 с ошибкой):</h4>
+                    <div class="response-error">
+                        <pre>{
+    "data": "no permission acces"
+}</pre>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Коды ошибок -->
+            <section id="errors" class="section">
+                <div class="section-title">
+                    <span class="section-icon">⚠️</span>
+                    <h2>Коды ошибок</h2>
                 </div>
 
-                <h4>📋 Параметры:</h4>
                 <table>
                     <tr>
-                        <th>Поле</th>
-                        <th>Тип</th>
-                        <th>Обязательность</th>
+                        <th>Код</th>
                         <th>Описание</th>
                     </tr>
                     <tr>
-                        <td>uid</td>
-                        <td>integer</td>
-                        <td class="param-required">✅ Да</td>
-                        <td>ID пользователя для удаления</td>
+                        <td><strong>200</strong></td>
+                        <td>Успешный запрос (даже при ошибках может возвращать 200 с полем "error")</td>
+                    </tr>
+                    <tr>
+                        <td><strong>201</strong></td>
+                        <td>Успешное создание</td>
+                    </tr>
+                    <tr>
+                        <td><strong>400</strong></td>
+                        <td>Неверные данные запроса</td>
+                    </tr>
+                    <tr>
+                        <td><strong>401</strong></td>
+                        <td>Не авторизован (нет токена)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>403</strong></td>
+                        <td>Доступ запрещен (недостаточно прав)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>404</strong></td>
+                        <td>Ресурс не найден</td>
+                    </tr>
+                    <tr>
+                        <td><strong>500</strong></td>
+                        <td>Внутренняя ошибка сервера</td>
                     </tr>
                 </table>
+            </section>
 
-                <h4>✅ Успешный ответ (200):</h4>
-                <div class="response-success">
-                    <pre>{
-    "data": "user not found"
-}</pre>
+            <!-- Примечания -->
+            <section id="notes" class="section">
+                <div class="section-title">
+                    <span class="section-icon">📝</span>
+                    <h2>Важные примечания</h2>
                 </div>
 
-                <h4>❌ Ошибка доступа (200 с ошибкой):</h4>
-                <div class="response-error">
-                    <pre>{
-    "data": "no permission acces"
-}</pre>
-                </div>
-            </div>
-        </section>
+                <ul style="list-style-type: none; padding: 0;">
+                    <li style="margin-bottom: 1rem; padding: 1rem; background: #f8fafc; border-radius: 10px;">
+                        <strong>📦 1. Каждая запись товара = одна физическая единица</strong><br>
+                        Каждая запись в БД соответствует одной коробке, мешку и т.д. Нет поля Quantity.
+                    </li>
+                    <li style="margin-bottom: 1rem; padding: 1rem; background: #f8fafc; border-radius: 10px;">
+                        <strong>🔄 2. Статусы товаров:</strong><br>
+                        exists - активный (на складе)<br>
+                        deleted - списан/удален
+                    </li>
+                    <li style="margin-bottom: 1rem; padding: 1rem; background: #f8fafc; border-radius: 10px;">
+                        <strong>📋 3. Действия движений:</strong><br>
+                        adding - добавление товара<br>
+                        disposal - списание товара
+                    </li>
+                    <li style="margin-bottom: 1rem; padding: 1rem; background: #f8fafc; border-radius: 10px;">
+                        <strong>👔 4. Должности:</strong><br>
+                        1 - Administrator (полный доступ)<br>
+                        2 - Warehouse_Operator (ограниченный доступ)
+                    </li>
+                    <li style="margin-bottom: 1rem; padding: 1rem; background: #f8fafc; border-radius: 10px;">
+                        <strong>🔑 5. Токены:</strong><br>
+                        Токен автоматически создается при регистрации/входе и удаляется при выходе
+                    </li>
+                    <li style="margin-bottom: 1rem; padding: 1rem; background: #f8fafc; border-radius: 10px;">
+                        <strong>🆕 6. Новые эндпоинты:</strong><br>
+                        Добавлена фильтрация товаров (просроченные/списанные), движений по типу и сотрудников по должности
+                    </li>
+                    <li style="margin-bottom: 1rem; padding: 1rem; background: #f8fafc; border-radius: 10px; border-left: 4px solid #49cc90;">
+                        <strong>📊 7. Группировка товаров (НОВОЕ!):</strong><br>
+                        Все GET запросы для товаров теперь возвращают сгруппированные данные:<br>
+                        - <strong>/select_all</strong> - возвращает <code>total_quantity</code>, <code>active_quantity</code>, <code>deleted_quantity</code><br>
+                        - <strong>/select_expired</strong> и <strong>/select_deleted</strong> - возвращают <code>quantity</code><br>
+                        Это позволяет видеть общее количество одинаковых позиций на складе.
+                    </li>
+                </ul>
+            </section>
 
-        <!-- Коды ошибок -->
-        <section class="section">
-            <div class="section-title">
-                <span class="section-icon">⚠️</span>
-                <h2>Коды ошибок</h2>
-            </div>
-
-            <table>
-                <tr>
-                    <th>Код</th>
-                    <th>Описание</th>
-                </tr>
-                <tr>
-                    <td><strong>200</strong></td>
-                    <td>Успешный запрос (даже при ошибках может возвращать 200 с полем "error")</td>
-                </tr>
-                <tr>
-                    <td><strong>201</strong></td>
-                    <td>Успешное создание</td>
-                </tr>
-                <tr>
-                    <td><strong>400</strong></td>
-                    <td>Неверные данные запроса</td>
-                </tr>
-                <tr>
-                    <td><strong>401</strong></td>
-                    <td>Не авторизован (нет токена)</td>
-                </tr>
-                <tr>
-                    <td><strong>403</strong></td>
-                    <td>Доступ запрещен (недостаточно прав)</td>
-                </tr>
-                <tr>
-                    <td><strong>404</strong></td>
-                    <td>Ресурс не найден</td>
-                </tr>
-                <tr>
-                    <td><strong>500</strong></td>
-                    <td>Внутренняя ошибка сервера</td>
-                </tr>
-            </table>
-        </section>
-
-        <!-- Примечания -->
-        <section class="section">
-            <div class="section-title">
-                <span class="section-icon">📝</span>
-                <h2>Важные примечания</h2>
-            </div>
-
-            <ul style="list-style-type: none; padding: 0;">
-                <li style="margin-bottom: 1rem; padding: 1rem; background: #f8fafc; border-radius: 10px;">
-                    <strong>📦 1. Каждая запись товара = одна физическая единица</strong><br>
-                    Каждая запись в БД соответствует одной коробке, мешку и т.д. Нет поля Quantity.
-                </li>
-                <li style="margin-bottom: 1rem; padding: 1rem; background: #f8fafc; border-radius: 10px;">
-                    <strong>🔄 2. Статусы товаров:</strong><br>
-                    exists - активный (на складе)<br>
-                    deleted - списан/удален
-                </li>
-                <li style="margin-bottom: 1rem; padding: 1rem; background: #f8fafc; border-radius: 10px;">
-                    <strong>📋 3. Действия движений:</strong><br>
-                    adding - добавление товара<br>
-                    disposal - списание товара
-                </li>
-                <li style="margin-bottom: 1rem; padding: 1rem; background: #f8fafc; border-radius: 10px;">
-                    <strong>👔 4. Должности:</strong><br>
-                    1 - Administrator (полный доступ)<br>
-                    2 - Warehouse_Operator (ограниченный доступ)
-                </li>
-                <li style="margin-bottom: 1rem; padding: 1rem; background: #f8fafc; border-radius: 10px;">
-                    <strong>🔑 5. Токены:</strong><br>
-                    Токен автоматически создается при регистрации/входе и удаляется при выходе
-                </li>
-                <li style="margin-bottom: 1rem; padding: 1rem; background: #f8fafc; border-radius: 10px;">
-                    <strong>🆕 6. Новые эндпоинты:</strong><br>
-                    Добавлена фильтрация товаров (просроченные/списанные), движений по типу и сотрудников по должности
-                </li>
-                <li style="margin-bottom: 1rem; padding: 1rem; background: #f8fafc; border-radius: 10px; border-left: 4px solid #49cc90;">
-                    <strong>📊 7. Группировка товаров (НОВОЕ!):</strong><br>
-                    Все GET запросы для товаров теперь возвращают сгруппированные данные:<br>
-                    - <strong>/select_all</strong> - возвращает <code>total_quantity</code>, <code>active_quantity</code>, <code>deleted_quantity</code><br>
-                    - <strong>/select_expired</strong> и <strong>/select_deleted</strong> - возвращают <code>quantity</code><br>
-                    Это позволяет видеть общее количество одинаковых позиций на складе.
-                </li>
-            </ul>
-        </section>
-
-        <footer class="footer">
-            <p>🐾 Pet Storage API Documentation v1.1 | Разработано для управления складом зоомагазина</p>
-            <p style="margin-top: 0.5rem; font-size: 0.9rem;">Последнее обновление: 18 марта 2024</p>
-        </footer>
+            <footer class="footer">
+                <p>🐾 Pet Storage API Documentation v1.1 | Разработано для управления складом зоомагазина</p>
+                <p style="margin-top: 0.5rem; font-size: 0.9rem;">Последнее обновление: 18 марта 2024</p>
+            </footer>
+        </div>
     </div>
+
+    <script>
+        // Управление навигацией
+        const navToggle = document.getElementById('navToggle');
+        const navContainer = document.getElementById('navContainer');
+        const mainContent = document.getElementById('mainContent');
+
+        function toggleNav() {
+            navContainer.classList.toggle('visible');
+            mainContent.classList.toggle('expanded');
+        }
+
+        function closeNav() {
+            if (window.innerWidth <= 768) {
+                navContainer.classList.remove('visible');
+                mainContent.classList.remove('expanded');
+            }
+        }
+
+        navToggle.addEventListener('click', toggleNav);
+
+        // Закрытие навигации при клике на ссылку
+        document.querySelectorAll('.nav-link, .nav-sublink').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href');
+                if (targetId && targetId !== '#') {
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        targetElement.scrollIntoView({ behavior: 'smooth' });
+                    }
+                }
+                closeNav();
+            });
+        });
+
+        // Закрытие навигации при клике вне её
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768) {
+                if (!navContainer.contains(e.target) && !navToggle.contains(e.target)) {
+                    closeNav();
+                }
+            }
+        });
+
+        // Обновление активного пункта меню при скролле
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (pageYOffset >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
 </body>
 </html>
