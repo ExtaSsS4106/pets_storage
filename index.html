@@ -223,6 +223,16 @@
             gap: 2rem;
         }
 
+        .new-badge {
+            background: #49cc90;
+            color: white;
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 3px;
+            margin-left: 0.5rem;
+            vertical-align: middle;
+        }
+
         @media (max-width: 768px) {
             .grid-2 {
                 grid-template-columns: 1fr;
@@ -323,7 +333,7 @@
                     </tr>
                 </table>
 
-                <h4>✅ Успешный ответ (201):</h4>
+                <h4>✅ Успешный ответ (200):</h4>
                 <div class="response-success">
                     <pre>{
     "token": "9944b09199c62bcf9418ad846dd0e4bbdfc6ee4b",
@@ -431,11 +441,64 @@
     }
 }</pre>
                 </div>
+            </div>
 
-                <h4>📭 Пустой ответ:</h4>
+            <!-- Просроченные товары -->
+            <div class="endpoint">
+                <span class="method method-get">GET</span>
+                <span class="endpoint-url">/select_expired</span>
+                <span class="badge badge-auth">🔒 Требуется токен</span>
+                <span class="new-badge">NEW</span>
+                <div class="description">Получить список просроченных товаров (Expiry_Date &lt; сегодня, Status='exists')</div>
+
+                <h4>✅ Успешный ответ (200):</h4>
                 <div class="response-success">
                     <pre>{
-    "data": "empty"
+    "data": {
+        "status": "expired_products",
+        "data": [
+            {
+                "id": 5,
+                "name": "Корм для собак",
+                "manufacturer": "Purina",
+                "category": "dry",
+                "animal_type": "dogs",
+                "expiry_date": "2024-01-15",
+                "delivery_date": "2023-12-01",
+                "status": "exists"
+            }
+        ]
+    }
+}</pre>
+                </div>
+            </div>
+
+            <!-- Списанные товары -->
+            <div class="endpoint">
+                <span class="method method-get">GET</span>
+                <span class="endpoint-url">/select_deleted</span>
+                <span class="badge badge-auth">🔒 Требуется токен</span>
+                <span class="new-badge">NEW</span>
+                <div class="description">Получить список списанных товаров (Status='deleted')</div>
+
+                <h4>✅ Успешный ответ (200):</h4>
+                <div class="response-success">
+                    <pre>{
+    "data": {
+        "status": "deleted_products",
+        "data": [
+            {
+                "id": 3,
+                "name": "Лакомство для кошек",
+                "manufacturer": "Whiskas",
+                "category": "treats",
+                "animal_type": "cats",
+                "expiry_date": "2023-12-31",
+                "delivery_date": "2023-10-15",
+                "status": "deleted"
+            }
+        ]
+    }
 }</pre>
                 </div>
             </div>
@@ -461,6 +524,27 @@
     ]
 }</pre>
                 </div>
+
+                <h4>📋 Параметры (category_id и animal_type_id):</h4>
+                <table>
+                    <tr>
+                        <th>ID</th>
+                        <th>Категория</th>
+                    </tr>
+                    <tr><td>1</td><td>dry</td></tr>
+                    <tr><td>2</td><td>wet</td></tr>
+                    <tr><td>3</td><td>treats</td></tr>
+                    <tr><td>4</td><td>hay</td></tr>
+                </table>
+                <table>
+                    <tr>
+                        <th>ID</th>
+                        <th>Тип животного</th>
+                    </tr>
+                    <tr><td>1</td><td>dogs</td></tr>
+                    <tr><td>2</td><td>cats</td></tr>
+                    <tr><td>3</td><td>rodents</td></tr>
+                </table>
 
                 <h4>✅ Успешный ответ (200):</h4>
                 <div class="response-success">
@@ -538,6 +622,7 @@
                 <h2>Движения товаров</h2>
             </div>
 
+            <!-- Все движения -->
             <div class="endpoint">
                 <span class="method method-get">GET</span>
                 <span class="endpoint-url">/select_movment</span>
@@ -553,6 +638,44 @@
             {
                 "id": 1,
                 "name": "Вискас с курицей",
+                "manufacturer": "Mars",
+                "p_id": 1,
+                "action": "adding",
+                "date_time": "2024-03-17T12:30:45.123Z",
+                "description": null,
+                "employee": "Иван Петров",
+                "employee_email": "ivan@example.com"
+            }
+        ]
+    }
+}</pre>
+                </div>
+            </div>
+
+            <!-- Движения по типу -->
+            <div class="endpoint">
+                <span class="method method-get">GET</span>
+                <span class="endpoint-url">/select_movment/&lt;str:action&gt;</span>
+                <span class="badge badge-auth">🔒 Требуется токен</span>
+                <span class="new-badge">NEW</span>
+                <div class="description">Получить движения по типу действия (adding, disposal)</div>
+
+                <h4>🔍 Примеры:</h4>
+                <ul style="margin-bottom: 1rem;">
+                    <li><code>/select_movment/adding</code> - только добавления</li>
+                    <li><code>/select_movment/disposal</code> - только списания</li>
+                </ul>
+
+                <h4>✅ Успешный ответ (200):</h4>
+                <div class="response-success">
+                    <pre>{
+    "data": {
+        "status": "adding_movments",
+        "data": [
+            {
+                "id": 1,
+                "name": "Вискас с курицей",
+                "manufacturer": "Mars",
                 "p_id": 1,
                 "action": "adding",
                 "date_time": "2024-03-17T12:30:45.123Z",
@@ -574,7 +697,7 @@
                 <h2>Сотрудники</h2>
             </div>
 
-            <!-- Получить сотрудников -->
+            <!-- Все сотрудники -->
             <div class="endpoint">
                 <span class="method method-get">GET</span>
                 <span class="endpoint-url">/select_employees</span>
@@ -593,7 +716,43 @@
                 "date_of_birth": "1990-01-01",
                 "phone_number": "+1234567890",
                 "email": "ivan@example.com",
-                "position": "Administrator"
+                "position": "Administrator",
+                "position_id": 1
+            }
+        ]
+    }
+}</pre>
+                </div>
+            </div>
+
+            <!-- Сотрудники по должности -->
+            <div class="endpoint">
+                <span class="method method-get">GET</span>
+                <span class="endpoint-url">/select_employees/&lt;int:position_id&gt;</span>
+                <span class="badge badge-auth">🔒 Требуется токен</span>
+                <span class="new-badge">NEW</span>
+                <div class="description">Получить сотрудников по должности</div>
+
+                <h4>🔍 Примеры:</h4>
+                <ul style="margin-bottom: 1rem;">
+                    <li><code>/select_employees/1</code> - администраторы</li>
+                    <li><code>/select_employees/2</code> - кладовщики</li>
+                </ul>
+
+                <h4>✅ Успешный ответ (200):</h4>
+                <div class="response-success">
+                    <pre>{
+    "data": {
+        "status": "employees_position_1",
+        "data": [
+            {
+                "id": 1,
+                "full_name": "Иван Петров",
+                "date_of_birth": "1990-01-01",
+                "phone_number": "+1234567890",
+                "email": "ivan@example.com",
+                "position": "Administrator",
+                "position_id": 1
             }
         ]
     }
@@ -638,7 +797,7 @@
 }</pre>
                 </div>
 
-                <h4>❌ Ошибка доступа (403):</h4>
+                <h4>❌ Ошибка доступа (200 с ошибкой):</h4>
                 <div class="response-error">
                     <pre>{
     "data": "no permission acces"
@@ -661,7 +820,7 @@
                 </tr>
                 <tr>
                     <td><strong>200</strong></td>
-                    <td>Успешный запрос</td>
+                    <td>Успешный запрос (даже при ошибках может возвращать 200 с полем "error")</td>
                 </tr>
                 <tr>
                     <td><strong>201</strong></td>
@@ -704,7 +863,7 @@
                 </li>
                 <li style="margin-bottom: 1rem; padding: 1rem; background: #f8fafc; border-radius: 10px;">
                     <strong>🔄 2. Статусы товаров:</strong><br>
-                    active - активный (на складе)<br>
+                    exists - активный (на складе)<br>
                     deleted - списан/удален
                 </li>
                 <li style="margin-bottom: 1rem; padding: 1rem; background: #f8fafc; border-radius: 10px;">
@@ -721,12 +880,16 @@
                     <strong>🔑 5. Токены:</strong><br>
                     Токен автоматически создается при регистрации/входе и удаляется при выходе
                 </li>
+                <li style="margin-bottom: 1rem; padding: 1rem; background: #f8fafc; border-radius: 10px;">
+                    <strong>🆕 6. Новые эндпоинты:</strong><br>
+                    Добавлена фильтрация товаров (просроченные/списанные), движений по типу и сотрудников по должности
+                </li>
             </ul>
         </section>
 
         <footer class="footer">
-            <p>🐾 Pet Storage API Documentation v1.0 | Разработано для управления складом зоомагазина</p>
-            <p style="margin-top: 0.5rem; font-size: 0.9rem;">Последнее обновление: 17 марта 2024</p>
+            <p>🐾 Pet Storage API Documentation v1.1 | Разработано для управления складом зоомагазина</p>
+            <p style="margin-top: 0.5rem; font-size: 0.9rem;">Последнее обновление: 18 марта 2024</p>
         </footer>
     </div>
 </body>
