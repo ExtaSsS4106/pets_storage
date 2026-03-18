@@ -164,7 +164,7 @@ def delete(request):
 @permission_classes([IsAuthenticated])
 def select_all(request):
     try:
-        products = Products_in_storage.objects.all()
+        products = Products_in_storage.objects.all().order_by('-ID')
         if products.exists():
             response = {
                 "status": "all_products",
@@ -188,7 +188,7 @@ def select_movment(request):
         if movments.exists():
             response = {
                 "status": "all_movments",
-                "data": [{"id":m.ID, "name":m.Products_in_storage_ID.Name, "p_id":m.Products_in_storage_ID.ID, "action":m.Action, "date_time": m.Date_Time, "description":m.Description, "employee":m.Employee_ID.Full_Name, "employee_email":m.Employee_ID.Email} for m in movments],
+                "data": [{"id":m.ID, "name":m.Products_in_storage_ID.Name, "manufacturer":m.Products_in_storage_ID.Manufacturer, "p_id":m.Products_in_storage_ID.ID, "action":m.Action, "date_time": m.Date_Time, "description":m.Description, "employee":m.Employee_ID.Full_Name, "employee_email":m.Employee_ID.Email} for m in movments],
             }
             return JsonResponse({"data": response})
         else:
@@ -208,7 +208,7 @@ def select_employees(request):
         if employees.exists():
             response = {
                 "status": "all_employees",
-                "data": [{"id":e.ID, "full_name":e.Full_Name, "date_of_birth":e.Date_of_Birth, "phone_number":e.Phone_Number, "email": e.Email, "position":e.Position_ID.Type} for e in employees],
+                "data": [{"id":e.ID, "full_name":e.Full_Name, "date_of_birth":e.Date_of_Birth, "phone_number":e.Phone_Number, "email": e.Email, "position":e.Position_ID.Type, "position_id": e.Position_ID.ID} for e in employees],
             }
             return JsonResponse({"data": response})
         else:
@@ -244,4 +244,83 @@ def delete_employees(request):
         }
         return JsonResponse({"data": response})
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def select_expired(request):
+    try:
+        from datetime import date
+        products = Products_in_storage.objects.filter(Expiry_Date__lt=date.today(), Status='exists')
+        if products.exists():
+            response = {
+                "status": "expired_products",
+                "data": [{"id":p.ID, "name":p.Name, "manufacturer":p.Manufacturer, "category":p.Category_ID.Type, "animal_type": p.Animal_Type_ID.Type, "expiry_date":p.Expiry_Date, "delivery_date":p.Delivery_Date, "status":p.Status} for p in products],
+            }
+            return JsonResponse({"data": response})
+        else:
+            return JsonResponse({"data": "empty"})
+    except Exception as e:
+        response = {
+            "status": "error",
+            "error": e,
+        }
+        return JsonResponse({"data": response})
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def select_deleted(request):
+    try:
+        products = Products_in_storage.objects.filter(Status='deleted')
+        if products.exists():
+            response = {
+                "status": "deleted_products",
+                "data": [{"id":p.ID, "name":p.Name, "manufacturer":p.Manufacturer, "category":p.Category_ID.Type, "animal_type": p.Animal_Type_ID.Type, "expiry_date":p.Expiry_Date, "delivery_date":p.Delivery_Date, "status":p.Status} for p in products],
+            }
+            return JsonResponse({"data": response})
+        else:
+            return JsonResponse({"data": "empty"})
+    except Exception as e:
+        response = {
+            "status": "error",
+            "error": e,
+        }
+        return JsonResponse({"data": response})
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def select_movment_by_action(request, action):
+    try:
+        movments = Item_Movements.objects.filter(Action=action)
+        if movments.exists():
+            response = {
+                "status": f"{action}_movments",
+                "data": [{"id":m.ID, "name":m.Products_in_storage_ID.Name, "manufacturer":m.Products_in_storage_ID.Manufacturer, "p_id":m.Products_in_storage_ID.ID, "action":m.Action, "date_time": m.Date_Time, "description":m.Description, "employee":m.Employee_ID.Full_Name, "employee_email":m.Employee_ID.Email} for m in movments],
+            }
+            return JsonResponse({"data": response})
+        else:
+            return JsonResponse({"data": "empty"})
+    except Exception as e:
+        response = {
+            "status": "error",
+            "error": e,
+        }
+        return JsonResponse({"data": response})
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def select_employees_by_position(request, position_id):
+    try:
+        employees = Employees.objects.filter(Position_ID_id=position_id)
+        if employees.exists():
+            response = {
+                "status": f"employees_position_{position_id}",
+                "data": [{"id":e.ID, "full_name":e.Full_Name, "date_of_birth":e.Date_of_Birth, "phone_number":e.Phone_Number, "email": e.Email, "position":e.Position_ID.Type, "position_id": e.Position_ID.ID} for e in employees],
+            }
+            return JsonResponse({"data": response})
+        else:
+            return JsonResponse({"data": "empty"})
+    except Exception as e:
+        response = {
+            "status": "error",
+            "error": e,
+        }
+        return JsonResponse({"data": response})
