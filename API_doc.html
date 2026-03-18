@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Storage API Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: #f5f7fb;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 20px;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+        }
+
+        .base-url {
+            background: rgba(255,255,255,0.2);
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            display: inline-block;
+            margin-top: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+        }
+
+        .section {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .section-title h2 {
+            color: #1e293b;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .section-icon {
+            font-size: 2rem;
+            margin-right: 1rem;
+        }
+
+        .endpoint {
+            background: #f8fafc;
+            border-left: 4px solid #667eea;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: 10px;
+            transition: transform 0.2s;
+        }
+
+        .endpoint:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.1);
+        }
+
+        .method {
+            display: inline-block;
+            padding: 0.3rem 1rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-right: 1rem;
+        }
+
+        .method-post {
+            background: #49cc90;
+            color: white;
+        }
+
+        .method-get {
+            background: #61affe;
+            color: white;
+        }
+
+        .method-delete {
+            background: #f93e3e;
+            color: white;
+        }
+
+        .endpoint-url {
+            font-family: 'Courier New', monospace;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.2rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-left: 1rem;
+        }
+
+        .badge-auth {
+            background: #ffd700;
+            color: #1e293b;
+        }
+
+        .badge-admin {
+            background: #f93e3e;
+            color: white;
+        }
+
+        .description {
+            margin: 1rem 0;
+            color: #475569;
+        }
+
+        .request-box {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+
+        .request-box pre {
+            margin: 0;
+            white-space: pre-wrap;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+            padding: 0.8rem;
+            text-align: left;
+        }
+
+        td {
+            padding: 0.8rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        tr:hover {
+            background: #f8fafc;
+        }
+
+        .param-required {
+            color: #f93e3e;
+            font-weight: 600;
+        }
+
+        .param-optional {
+            color: #94a3b8;
+        }
+
+        .response-success {
+            border-left: 4px solid #49cc90;
+            background: #f0fdf4;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .response-error {
+            border-left: 4px solid #f93e3e;
+            background: #fef2f2;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: #64748b;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🐾 Pet Storage API Documentation</h1>
+            <p>Система учета товаров для зоомагазина / склада</p>
+            <div class="base-url">
+                📍 Базовый URL: http://127.0.0.1:8000
+            </div>
+        </header>
+
+        <!-- Аутентификация -->
+        <section class="section">
+            <div class="section-title">
+                <span class="section-icon">🔐</span>
+                <h2>Аутентификация</h2>
+            </div>
+            <p style="margin-bottom: 1rem;">API использует <strong>Token Authentication</strong>. После успешного входа/регистрации вы получаете токен, который нужно передавать в заголовке каждого запроса:</p>
+            <div class="request-box">
+                <pre>Authorization: Token &lt;your_token_key&gt;</pre>
+            </div>
+
+            <!-- Регистрация -->
+            <div class="endpoint">
+                <span class="method method-post">POST</span>
+                <span class="endpoint-url">/sign_up</span>
+                <span class="badge">Регистрация</span>
+                <div class="description">Создает нового пользователя и сотрудника</div>
+                
+                <h4>📥 Request Body:</h4>
+                <div class="request-box">
+                    <pre>{
+    "full_name": "Иван Петров",
+    "email": "ivan@example.com",
+    "password1": "securepass123",
+    "password2": "securepass123",
+    "date_of_birth": "1990-01-01",
+    "phone_number": "+1234567890",
+    "position_id": 1
+}</pre>
+                </div>
+
+                <h4>📋 Параметры:</h4>
+                <table>
+                    <tr>
+                        <th>Поле</th>
+                        <th>Тип</th>
+                        <th>Обязательность</th>
+                        <th>Описание</th>
+                    </tr>
+                    <tr>
+                        <td>full_name</td>
+                        <td>string</td>
+                        <td class="param-required">✅ Да</td>
+                        <td>Полное имя сотрудника</td>
+                    </tr>
+                    <tr>
+                        <td>email</td>
+                        <td>string</td>
+                        <td class="param-required">✅ Да</td>
+                        <td>Email (уникальный)</td>
+                    </tr>
+                    <tr>
+                        <td>password1</td>
+                        <td>string</td>
+                        <td class="param-required">✅ Да</td>
+                        <td>Пароль</td>
+                    </tr>
+                    <tr>
+                        <td>password2</td>
+                        <td>string</td>
+                        <td class="param-required">✅ Да</td>
+                        <td>Подтверждение пароля</td>
+                    </tr>
+                    <tr>
+                        <td>date_of_birth</td>
+                        <td>date</td>
+                        <td class="param-required">✅ Да</td>
+                        <td>Дата рождения (YYYY-MM-DD)</td>
+                    </tr>
+                    <tr>
+                        <td>phone_number</td>
+                        <td>string</td>
+                        <td class="param-required">✅ Да</td>
+                        <td>Номер телефона</td>
+                    </tr>
+                    <tr>
+                        <td>position_id</td>
+                        <td>integer</td>
+                        <td class="param-required">✅ Да</td>
+                        <td>1 - Administrator, 2 - Warehouse_Operator</td>
+                    </tr>
+                </table>
+
+                <h4>✅ Успешный ответ (201):</h4>
+                <div class="response-success">
+                    <pre>{
+    "token": "9944b09199c62bcf9418ad846dd0e4bbdfc6ee4b",
+    "user": {
+        "full_name": "Иван Петров",
+        "email": "ivan@example.com"
+    }
+}</pre>
+                </div>
+
+                <h4>❌ Ошибка (400):</h4>
+                <div class="response-error">
+                    <pre>{
+    "password2": ["Пароли не совпадают"],
+    "email": ["Сотрудник с таким email уже существует"]
+}</pre>
+                </div>
+            </div>
+
+            <!-- Вход -->
+            <div class="endpoint">
+                <span class="method method-post">POST</span>
+                <span class="endpoint-url">/login_api</span>
+                <span class="badge">Вход</span>
+                <div class="description">Авторизация пользователя</div>
+                
+                <div class="request-box">
+                    <pre>{
+    "email": "ivan@example.com",
+    "password": "securepass123"
+}</pre>
+                </div>
+
+                <h4>✅ Успешный ответ (200):</h4>
+                <div class="response-success">
+                    <pre>{
+    "token": "9944b09199c62bcf9418ad846dd0e4bbdfc6ee4b",
+    "user": {
+        "full_name": "Иван Петров",
+        "email": "ivan@example.com"
+    }
+}</pre>
+                </div>
+
+                <h4>❌ Ошибка (404):</h4>
+                <div class="response-error">
+                    <pre>{
+    "detail": "wrong password"
+}</pre>
+                </div>
+            </div>
+
+            <!-- Выход -->
+            <div class="endpoint">
+                <span class="method method-post">POST</span>
+                <span class="endpoint-url">/logout_api</span>
+                <span class="badge badge-auth">🔒 Требуется токен</span>
+                <div class="description">Выход из системы (удаление токена)</div>
+                
+                <h4>📤 Headers:</h4>
+                <div class="request-box">
+                    <pre>Authorization: Token 9944b09199c62bcf9418ad846dd0e4bbdfc6ee4b</pre>
+                </div>
+
+                <h4>✅ Успешный ответ (200):</h4>
+                <div class="response-success">
+                    <pre>{
+    "detail": "Успешный выход"
+}</pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Товары -->
+        <section class="section">
+            <div class="section-title">
+                <span class="section-icon">📦</span>
+                <h2>Товары</h2>
+            </div>
+
+            <!-- Получить все товары -->
+            <div class="endpoint">
+                <span class="method method-get">GET</span>
+                <span class="endpoint-url">/select_all</span>
+                <span class="badge badge-auth">🔒 Требуется токен</span>
+                <div class="description">Получить список всех товаров на складе</div>
+
+                <h4>✅ Успешный ответ (200):</h4>
+                <div class="response-success">
+                    <pre>{
+    "data": {
+        "status": "all_products",
+        "data": [
+            {
+                "id": 1,
+                "name": "Вискас с курицей",
+                "manufacturer": "Mars",
+                "category": "wet",
+                "animal_type": "cats",
+                "expiry_date": "2025-12-31",
+                "delivery_date": "2024-03-17",
+                "status": "active"
+            }
+        ]
+    }
+}</pre>
+                </div>
+
+                <h4>📭 Пустой ответ:</h4>
+                <div class="response-success">
+                    <pre>{
+    "data": "empty"
+}</pre>
+                </div>
+            </div>
+
+            <!-- Добавить товары -->
+            <div class="endpoint">
+                <span class="method method-post">POST</span>
+                <span class="endpoint-url">/add</span>
+                <span class="badge badge-auth">🔒 Требуется токен</span>
+                <div class="description">Добавить новые товары на склад</div>
+
+                <div class="request-box">
+                    <pre>{
+    "new_products": [
+        {
+            "name": "Вискас с курицей",
+            "manufacturer": "Mars",
+            "category_id": 1,
+            "animal_type_id": 1,
+            "expiry_date": "2025-12-31",
+            "delivery_date": "2024-03-17"
+        }
+    ]
+}</pre>
+                </div>
+
+                <h4>✅ Успешный ответ (200):</h4>
+                <div class="response-success">
+                    <pre>{
+    "data": {
+        "errors_count": 0,
+        "list": [],
+        "status": "not added"
+    }
+}</pre>
+                </div>
+            </div>
+
+            <!-- Удалить товары -->
+            <div class="endpoint">
+                <span class="method method-post">POST</span>
+                <span class="endpoint-url">/delete</span>
+                <span class="badge badge-auth">🔒 Требуется токен</span>
+                <div class="description">Списание товаров (изменение статуса на "deleted")</div>
+
+                <div class="request-box">
+                    <pre>{
+    "products": [
+        {"id": 1},
+        {"id": 2},
+        {"id": 3}
+    ]
+}</pre>
+                </div>
+
+                <h4>✅ Успешный ответ (200):</h4>
+                <div class="response-success">
+                    <pre>{
+    "data": {
+        "errors_count": 0,
+        "list": [],
+        "status": "not added"
+    }
+}</pre>
+                </div>
+            </div>
+
+            <!-- GET add - справочники -->
+            <div class="endpoint">
+                <span class="method method-get">GET</span>
+                <span class="endpoint-url">/add</span>
+                <span class="badge badge-auth">🔒 Требуется токен</span>
+                <div class="description">Получить справочники категорий и типов животных</div>
+
+                <h4>✅ Успешный ответ (200):</h4>
+                <div class="response-success">
+                    <pre>{
+    "data": {
+        "categories": [
+            {"id": 1, "type": "dry"},
+            {"id": 2, "type": "wet"},
+            {"id": 3, "type": "treats"},
+            {"id": 4, "type": "hay"}
+        ],
+        "animal_types": [
+            {"id": 1, "type": "dogs"},
+            {"id": 2, "type": "cats"},
+            {"id": 3, "type": "rodents"}
+        ]
+    }
+}</pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Движения товаров -->
+        <section class="section">
+            <div class="section-title">
+                <span class="section-icon">📊</span>
+                <h2>Движения товаров</h2>
+            </div>
+
+            <div class="endpoint">
+                <span class="method method-get">GET</span>
+                <span class="endpoint-url">/select_movment</span>
+                <span class="badge badge-auth">🔒 Требуется токен</span>
+                <div class="description">Получить историю всех движений товаров</div>
+
+                <h4>✅ Успешный ответ (200):</h4>
+                <div class="response-success">
+                    <pre>{
+    "data": {
+        "status": "all_movments",
+        "data": [
+            {
+                "id": 1,
+                "name": "Вискас с курицей",
+                "p_id": 1,
+                "action": "adding",
+                "date_time": "2024-03-17T12:30:45.123Z",
+                "description": null,
+                "employee": "Иван Петров",
+                "employee_email": "ivan@example.com"
+            }
+        ]
+    }
+}</pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Сотрудники -->
+        <section class="section">
+            <div class="section-title">
+                <span class="section-icon">👥</span>
+                <h2>Сотрудники</h2>
+            </div>
+
+            <!-- Получить сотрудников -->
+            <div class="endpoint">
+                <span class="method method-get">GET</span>
+                <span class="endpoint-url">/select_employees</span>
+                <span class="badge badge-auth">🔒 Требуется токен</span>
+                <div class="description">Получить список всех сотрудников</div>
+
+                <h4>✅ Успешный ответ (200):</h4>
+                <div class="response-success">
+                    <pre>{
+    "data": {
+        "status": "all_employees",
+        "data": [
+            {
+                "id": 1,
+                "full_name": "Иван Петров",
+                "date_of_birth": "1990-01-01",
+                "phone_number": "+1234567890",
+                "email": "ivan@example.com",
+                "position": "Administrator"
+            }
+        ]
+    }
+}</pre>
+                </div>
+            </div>
+
+            <!-- Удалить сотрудника -->
+            <div class="endpoint">
+                <span class="method method-post">POST</span>
+                <span class="endpoint-url">/delete_employees</span>
+                <span class="badge badge-auth">🔒 Требуется токен</span>
+                <span class="badge badge-admin">👑 Только администратор</span>
+                <div class="description">Удалить сотрудника (только для администратора, position_id = 1)</div>
+
+                <div class="request-box">
+                    <pre>{
+    "uid": 5
+}</pre>
+                </div>
+
+                <h4>📋 Параметры:</h4>
+                <table>
+                    <tr>
+                        <th>Поле</th>
+                        <th>Тип</th>
+                        <th>Обязательность</th>
+                        <th>Описание</th>
+                    </tr>
+                    <tr>
+                        <td>uid</td>
+                        <td>integer</td>
+                        <td class="param-required">✅ Да</td>
+                        <td>ID пользователя для удаления</td>
+                    </tr>
+                </table>
+
+                <h4>✅ Успешный ответ (200):</h4>
+                <div class="response-success">
+                    <pre>{
+    "data": "user not found"
+}</pre>
+                </div>
+
+                <h4>❌ Ошибка доступа (403):</h4>
+                <div class="response-error">
+                    <pre>{
+    "data": "no permission acces"
+}</pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Коды ошибок -->
+        <section class="section">
+            <div class="section-title">
+                <span class="section-icon">⚠️</span>
+                <h2>Коды ошибок</h2>
+            </div>
+
+            <table>
+                <tr>
+                    <th>Код</th>
+                    <th>Описание</th>
+                </tr>
+                <tr>
+                    <td><strong>200</strong></td>
+                    <td>Успешный запрос</td>
+                </tr>
+                <tr>
+                    <td><strong>201</strong></td>
+                    <td>Успешное создание</td>
+                </tr>
+                <tr>
+                    <td><strong>400</strong></td>
+                    <td>Неверные данные запроса</td>
+                </tr>
+                <tr>
+                    <td><strong>401</strong></td>
+                    <td>Не авторизован (нет токена)</td>
+                </tr>
+                <tr>
+                    <td><strong>403</strong></td>
+                    <td>Доступ запрещен (недостаточно прав)</td>
+                </tr>
+                <tr>
+                    <td><strong>404</strong></td>
+                    <td>Ресурс не найден</td>
+                </tr>
+                <tr>
+                    <td><strong>500</strong></td>
+                    <td>Внутренняя ошибка сервера</td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- Примечания -->
+        <section class="section">
+            <div class="section-title">
+                <span class="section-icon">📝</span>
+                <h2>Важные примечания</h2>
+            </div>
+
+            <ul style="list-style-type: none; padding: 0;">
+                <li style="margin-bottom: 1rem; padding: 1rem; background: #f8fafc; border-radius: 10px;">
+                    <strong>📦 1. Каждая запись товара = одна физическая единица</strong><br>
+                    Каждая запись в БД соответствует одной коробке, мешку и т.д. Нет поля Quantity.
+                </li>
+                <li style="margin-bottom: 1rem; padding: 1rem; background: #f8fafc; border-radius: 10px;">
+                    <strong>🔄 2. Статусы товаров:</strong><br>
+                    active - активный (на складе)<br>
+                    deleted - списан/удален
+                </li>
+                <li style="margin-bottom: 1rem; padding: 1rem; background: #f8fafc; border-radius: 10px;">
+                    <strong>📋 3. Действия движений:</strong><br>
+                    adding - добавление товара<br>
+                    disposal - списание товара
+                </li>
+                <li style="margin-bottom: 1rem; padding: 1rem; background: #f8fafc; border-radius: 10px;">
+                    <strong>👔 4. Должности:</strong><br>
+                    1 - Administrator (полный доступ)<br>
+                    2 - Warehouse_Operator (ограниченный доступ)
+                </li>
+                <li style="margin-bottom: 1rem; padding: 1rem; background: #f8fafc; border-radius: 10px;">
+                    <strong>🔑 5. Токены:</strong><br>
+                    Токен автоматически создается при регистрации/входе и удаляется при выходе
+                </li>
+            </ul>
+        </section>
+
+        <footer class="footer">
+            <p>🐾 Pet Storage API Documentation v1.0 | Разработано для управления складом зоомагазина</p>
+            <p style="margin-top: 0.5rem; font-size: 0.9rem;">Последнее обновление: 17 марта 2024</p>
+        </footer>
+    </div>
+</body>
+</html>
