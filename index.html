@@ -267,6 +267,11 @@
             color: white;
         }
 
+        .badge-updated {
+            background: #49cc90;
+            color: white;
+        }
+
         .description {
             margin: 1rem 0;
             color: #475569;
@@ -465,6 +470,33 @@
                 font-size: 0.75rem;
             }
         }
+
+        .status-table {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .status-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .status-card.exists {
+            border-left: 4px solid #49cc90;
+        }
+
+        .status-card.deleted {
+            border-left: 4px solid #f93e3e;
+        }
+
+        .status-card.delivery {
+            border-left: 4px solid #ffd700;
+        }
     </style>
 </head>
 <body>
@@ -632,7 +664,7 @@
     "user": {
         "full_name": "Иван Петров",
         "email": "ivan@example.com",
-        "position": "Admin"
+        "position": "Administrator"
     }
 }</pre>
                     </div>
@@ -667,7 +699,7 @@
     "user": {
         "full_name": "Иван Петров",
         "email": "ivan@example.com",
-        "position": "Admin"
+        "position": "Administrator"
     }
 }</pre>
                     </div>
@@ -701,19 +733,31 @@
                 </div>
             </section>
 
-            <!-- Товары (ОБНОВЛЕНО) -->
+            <!-- Товары -->
             <section id="products" class="section">
                 <div class="section-title">
                     <span class="section-icon">📦</span>
                     <h2>Товары</h2>
                 </div>
 
-                <!-- Получить все товары (ГРУППИРОВКА) -->
+                <div class="status-table">
+                    <div class="status-card exists">
+                        <strong>exists</strong> - активный товар на складе
+                    </div>
+                    <div class="status-card deleted">
+                        <strong>deleted</strong> - списанный товар
+                    </div>
+                    <div class="status-card delivery">
+                        <strong>delivery</strong> - товар в поставке
+                    </div>
+                </div>
+
+                <!-- Получить все товары -->
                 <div id="select_all" class="endpoint">
                     <span class="method method-get">GET</span>
                     <span class="endpoint-url">/select_all</span>
                     <span class="badge badge-auth">🔒 Требуется токен</span>
-                    <span class="new-badge">ОБНОВЛЕНО</span>
+                    <span class="new-badge">АКТУАЛЬНО</span>
                     <div class="description">Получить список всех товаров на складе с группировкой по названию, производителю, категории, типу животного и сроку годности</div>
 
                     <h4>✅ Успешный ответ (200):</h4>
@@ -729,25 +773,25 @@
                 "animal_type": "cats",
                 "expiry_date": "2025-12-31",
                 "delivery_date": "2024-03-17",
+                "delivery_quantity": 0,
                 "total_quantity": 10,
-                "active_quantity": 8,
                 "deleted_quantity": 2,
-                "status": "active"
+                "status": "exists"
             }
         ]
     }
 }</pre>
                     </div>
-                    <p><strong>🔍 Что изменилось:</strong> Теперь товары группируются по одинаковым позициям. Вместо отдельных записей для каждой единицы товара, вы получаете одну запись с указанием общего количества, количества активных и списанных.</p>
+                    <p><strong>📊 Поля:</strong> <code>delivery_quantity</code>, <code>total_quantity</code>, <code>deleted_quantity</code>, <code>status</code></p>
                 </div>
 
-                <!-- Просроченные товары (ОБНОВЛЕНО) -->
+                <!-- Просроченные товары -->
                 <div id="select_expired" class="endpoint">
                     <span class="method method-get">GET</span>
                     <span class="endpoint-url">/select_expired</span>
                     <span class="badge badge-auth">🔒 Требуется токен</span>
                     <span class="new-badge">ОБНОВЛЕНО</span>
-                    <div class="description">Получить список просроченных товаров с группировкой</div>
+                    <div class="description">Получить список просроченных товаров (Expiry_Date &lt; сегодня) с группировкой</div>
 
                     <h4>✅ Успешный ответ (200):</h4>
                     <div class="response-success">
@@ -762,23 +806,25 @@
                 "animal_type": "dogs",
                 "expiry_date": "2024-01-15",
                 "delivery_date": "2023-12-01",
-                "quantity": 5,
-                "status": "expired"
+                "delivery_quantity": 0,
+                "total_quantity": 5,
+                "deleted_quantity": 0,
+                "status": "exists"
             }
         ]
     }
 }</pre>
                     </div>
-                    <p><strong>🔍 Что изменилось:</strong> Просроченные товары теперь группируются по одинаковым позициям с указанием общего количества просроченных единиц.</p>
+                    <p><strong>🔍 Особенность:</strong> Возвращает товары со статусом <code>exists</code> у которых истек срок годности</p>
                 </div>
 
-                <!-- Списанные товары (ОБНОВЛЕНО) -->
+                <!-- Списанные товары -->
                 <div id="select_deleted" class="endpoint">
                     <span class="method method-get">GET</span>
                     <span class="endpoint-url">/select_deleted</span>
                     <span class="badge badge-auth">🔒 Требуется токен</span>
                     <span class="new-badge">ОБНОВЛЕНО</span>
-                    <div class="description">Получить список списанных товаров с группировкой</div>
+                    <div class="description">Получить список списанных товаров (Status='deleted') с группировкой</div>
 
                     <h4>✅ Успешный ответ (200):</h4>
                     <div class="response-success">
@@ -793,14 +839,15 @@
                 "animal_type": "cats",
                 "expiry_date": "2023-12-31",
                 "delivery_date": "2023-10-15",
-                "quantity": 3,
+                "delivery_quantity": 0,
+                "total_quantity": 3,
+                "deleted_quantity": 3,
                 "status": "deleted"
             }
         ]
     }
 }</pre>
                     </div>
-                    <p><strong>🔍 Что изменилось:</strong> Списанные товары теперь группируются по одинаковым позициям с указанием общего количества списанных единиц.</p>
                 </div>
 
                 <!-- Добавить товары -->
@@ -808,7 +855,8 @@
                     <span class="method method-post">POST</span>
                     <span class="endpoint-url">/add</span>
                     <span class="badge badge-auth">🔒 Требуется токен</span>
-                    <div class="description">Добавить новые товары на склад</div>
+                    <span class="new-badge">СТАТУС DELIVERY</span>
+                    <div class="description">Добавить новые товары на склад (статус 'delivery' для новых поставок)</div>
 
                     <div class="request-box">
                         <pre>{
@@ -816,34 +864,26 @@
         {
             "name": "Вискас с курицей",
             "manufacturer": "Mars",
-            "category_id": 1,
-            "animal_type_id": 1,
+            "category_id": 2,
+            "animal_type_id": 2,
             "expiry_date": "2025-12-31",
-            "delivery_date": "2024-03-17"
+            "delivery_date": "2024-03-17",
+            "status": "delivery"
         }
     ]
 }</pre>
                     </div>
 
-                    <h4>📋 Параметры (category_id и animal_type_id):</h4>
+                    <h4>📋 Параметры:</h4>
                     <table>
                         <tr>
-                            <th>ID</th>
-                            <th>Категория</th>
+                            <th>Поле</th>
+                            <th>Тип</th>
+                            <th>Описание</th>
                         </tr>
-                        <tr><td>1</td><td>dry</td></tr>
-                        <tr><td>2</td><td>wet</td></tr>
-                        <tr><td>3</td><td>treats</td></tr>
-                        <tr><td>4</td><td>hay</td></tr>
-                    </table>
-                    <table>
-                        <tr>
-                            <th>ID</th>
-                            <th>Тип животного</th>
-                        </tr>
-                        <tr><td>1</td><td>dogs</td></tr>
-                        <tr><td>2</td><td>cats</td></tr>
-                        <tr><td>3</td><td>rodents</td></tr>
+                        <tr><td>category_id</td><td>integer</td><td>1-dry, 2-wet, 3-treats, 4-hay</td></tr>
+                        <tr><td>animal_type_id</td><td>integer</td><td>1-dogs, 2-cats, 3-rodents</td></tr>
+                        <tr><td>status</td><td>string</td><td>delivery (для поставок)</td></tr>
                     </table>
 
                     <h4>✅ Успешный ответ (200):</h4>
@@ -852,7 +892,7 @@
     "data": {
         "errors_count": 0,
         "list": [],
-        "status": "not added"
+        "status": "completed"
     }
 }</pre>
                     </div>
@@ -869,8 +909,7 @@
                         <pre>{
     "products": [
         {"id": 1},
-        {"id": 2},
-        {"id": 3}
+        {"id": 2}
     ]
 }</pre>
                     </div>
@@ -881,34 +920,7 @@
     "data": {
         "errors_count": 0,
         "list": [],
-        "status": "not added"
-    }
-}</pre>
-                    </div>
-                </div>
-
-                <!-- GET add - справочники (скрыто) -->
-                <div style="display: none;" class="endpoint">
-                    <span class="method method-get">GET</span>
-                    <span class="endpoint-url">/add</span>
-                    <span class="badge badge-auth">🔒 Требуется токен</span>
-                    <div class="description">Получить справочники категорий и типов животных</div>
-
-                    <h4>✅ Успешный ответ (200):</h4>
-                    <div class="response-success">
-                        <pre>{
-    "data": {
-        "categories": [
-            {"id": 1, "type": "dry"},
-            {"id": 2, "type": "wet"},
-            {"id": 3, "type": "treats"},
-            {"id": 4, "type": "hay"}
-        ],
-        "animal_types": [
-            {"id": 1, "type": "dogs"},
-            {"id": 2, "type": "cats"},
-            {"id": 3, "type": "rodents"}
-        ]
+        "status": "completed"
     }
 }</pre>
                     </div>
@@ -941,7 +953,7 @@
                 "manufacturer": "Mars",
                 "p_id": 1,
                 "action": "adding",
-                "date_time": "2024-03-17T12:30:45.123Z",
+                "date_time": "2024-03-17T12:30:45",
                 "description": null,
                 "employee": "Иван Петров",
                 "employee_email": "ivan@example.com"
@@ -957,13 +969,12 @@
                     <span class="method method-get">GET</span>
                     <span class="endpoint-url">/select_movment/&lt;str:action&gt;</span>
                     <span class="badge badge-auth">🔒 Требуется токен</span>
-                    <span class="new-badge">NEW</span>
-                    <div class="description">Получить движения по типу действия (adding, disposal)</div>
+                    <div class="description">Получить движения по типу действия</div>
 
                     <h4>🔍 Примеры:</h4>
                     <ul style="margin-bottom: 1rem;">
-                        <li><code>/select_movment/adding</code> - только добавления</li>
-                        <li><code>/select_movment/disposal</code> - только списания</li>
+                        <li><code>/select_movment/adding</code> - добавления</li>
+                        <li><code>/select_movment/disposal</code> - списания</li>
                     </ul>
 
                     <h4>✅ Успешный ответ (200):</h4>
@@ -978,10 +989,8 @@
                 "manufacturer": "Mars",
                 "p_id": 1,
                 "action": "adding",
-                "date_time": "2024-03-17T12:30:45.123Z",
-                "description": null,
-                "employee": "Иван Петров",
-                "employee_email": "ivan@example.com"
+                "date_time": "2024-03-17T12:30:45",
+                "employee": "Иван Петров"
             }
         ]
     }
@@ -1030,11 +1039,10 @@
                     <span class="method method-get">GET</span>
                     <span class="endpoint-url">/select_employees/&lt;int:position_id&gt;</span>
                     <span class="badge badge-auth">🔒 Требуется токен</span>
-                    <span class="new-badge">NEW</span>
                     <div class="description">Получить сотрудников по должности</div>
 
                     <h4>🔍 Примеры:</h4>
-                    <ul style="margin-bottom: 1rem;">
+                    <ul>
                         <li><code>/select_employees/1</code> - администраторы</li>
                         <li><code>/select_employees/2</code> - кладовщики</li>
                     </ul>
@@ -1048,9 +1056,6 @@
             {
                 "id": 1,
                 "full_name": "Иван Петров",
-                "date_of_birth": "1990-01-01",
-                "phone_number": "+1234567890",
-                "email": "ivan@example.com",
                 "position": "Administrator",
                 "position_id": 1
             }
@@ -1066,7 +1071,7 @@
                     <span class="endpoint-url">/delete_employees</span>
                     <span class="badge badge-auth">🔒 Требуется токен</span>
                     <span class="badge badge-admin">👑 Только администратор</span>
-                    <div class="description">Удалить сотрудника (только для администратора, position_id = 1)</div>
+                    <div class="description">Удалить сотрудника (position_id = 1)</div>
 
                     <div class="request-box">
                         <pre>{
@@ -1074,30 +1079,14 @@
 }</pre>
                     </div>
 
-                    <h4>📋 Параметры:</h4>
-                    <table>
-                        <tr>
-                            <th>Поле</th>
-                            <th>Тип</th>
-                            <th>Обязательность</th>
-                            <th>Описание</th>
-                        </tr>
-                        <tr>
-                            <td>uid</td>
-                            <td>integer</td>
-                            <td class="param-required">✅ Да</td>
-                            <td>ID пользователя для удаления</td>
-                        </tr>
-                    </table>
-
                     <h4>✅ Успешный ответ (200):</h4>
                     <div class="response-success">
                         <pre>{
-    "data": "user not found"
+    "data": "user deleted"
 }</pre>
                     </div>
 
-                    <h4>❌ Ошибка доступа (200 с ошибкой):</h4>
+                    <h4>❌ Ошибка:</h4>
                     <div class="response-error">
                         <pre>{
     "data": "no permission acces"
@@ -1118,34 +1107,13 @@
                         <th>Код</th>
                         <th>Описание</th>
                     </tr>
-                    <tr>
-                        <td><strong>200</strong></td>
-                        <td>Успешный запрос (даже при ошибках может возвращать 200 с полем "error")</td>
-                    </tr>
-                    <tr>
-                        <td><strong>201</strong></td>
-                        <td>Успешное создание</td>
-                    </tr>
-                    <tr>
-                        <td><strong>400</strong></td>
-                        <td>Неверные данные запроса</td>
-                    </tr>
-                    <tr>
-                        <td><strong>401</strong></td>
-                        <td>Не авторизован (нет токена)</td>
-                    </tr>
-                    <tr>
-                        <td><strong>403</strong></td>
-                        <td>Доступ запрещен (недостаточно прав)</td>
-                    </tr>
-                    <tr>
-                        <td><strong>404</strong></td>
-                        <td>Ресурс не найден</td>
-                    </tr>
-                    <tr>
-                        <td><strong>500</strong></td>
-                        <td>Внутренняя ошибка сервера</td>
-                    </tr>
+                    <tr><td><strong>200</strong></td><td>Успешный запрос</td></tr>
+                    <tr><td><strong>201</strong></td><td>Успешное создание</td></tr>
+                    <tr><td><strong>400</strong></td><td>Неверные данные запроса</td></tr>
+                    <tr><td><strong>401</strong></td><td>Не авторизован</td></tr>
+                    <tr><td><strong>403</strong></td><td>Доступ запрещен</td></tr>
+                    <tr><td><strong>404</strong></td><td>Ресурс не найден</td></tr>
+                    <tr><td><strong>500</strong></td><td>Внутренняя ошибка</td></tr>
                 </table>
             </section>
 
@@ -1158,51 +1126,38 @@
 
                 <ul style="list-style-type: none; padding: 0;">
                     <li style="margin-bottom: 1rem; padding: 1rem; background: #f8fafc; border-radius: 10px;">
-                        <strong>📦 1. Каждая запись товара = одна физическая единица</strong><br>
-                        Каждая запись в БД соответствует одной коробке, мешку и т.д. Нет поля Quantity.
+                        <strong>📦 1. Учет товаров</strong><br>
+                        Каждая запись = одна физическая единица (коробка, мешок). Нет поля quantity.
                     </li>
                     <li style="margin-bottom: 1rem; padding: 1rem; background: #f8fafc; border-radius: 10px;">
-                        <strong>🔄 2. Статусы товаров:</strong><br>
-                        exists - активный (на складе)<br>
-                        deleted - списан/удален
+                        <strong>🔄 2. Статусы товаров</strong><br>
+                        • <span style="color: #49cc90;">exists</span> - активный на складе<br>
+                        • <span style="color: #f93e3e;">deleted</span> - списан<br>
+                        • <span style="color: #ffd700;">delivery</span> - в поставке
                     </li>
                     <li style="margin-bottom: 1rem; padding: 1rem; background: #f8fafc; border-radius: 10px;">
-                        <strong>📋 3. Действия движений:</strong><br>
-                        adding - добавление товара<br>
-                        disposal - списание товара
+                        <strong>📋 3. Действия движений</strong><br>
+                        adding - добавление, disposal - списание
                     </li>
                     <li style="margin-bottom: 1rem; padding: 1rem; background: #f8fafc; border-radius: 10px;">
-                        <strong>👔 4. Должности:</strong><br>
-                        1 - Administrator (полный доступ)<br>
-                        2 - Warehouse_Operator (ограниченный доступ)
-                    </li>
-                    <li style="margin-bottom: 1rem; padding: 1rem; background: #f8fafc; border-radius: 10px;">
-                        <strong>🔑 5. Токены:</strong><br>
-                        Токен автоматически создается при регистрации/входе и удаляется при выходе
-                    </li>
-                    <li style="margin-bottom: 1rem; padding: 1rem; background: #f8fafc; border-radius: 10px;">
-                        <strong>🆕 6. Новые эндпоинты:</strong><br>
-                        Добавлена фильтрация товаров (просроченные/списанные), движений по типу и сотрудников по должности
+                        <strong>👔 4. Должности</strong><br>
+                        1 - Administrator, 2 - Warehouse_Operator
                     </li>
                     <li style="margin-bottom: 1rem; padding: 1rem; background: #f8fafc; border-radius: 10px; border-left: 4px solid #49cc90;">
-                        <strong>📊 7. Группировка товаров (НОВОЕ!):</strong><br>
-                        Все GET запросы для товаров теперь возвращают сгруппированные данные:<br>
-                        - <strong>/select_all</strong> - возвращает <code>total_quantity</code>, <code>active_quantity</code>, <code>deleted_quantity</code><br>
-                        - <strong>/select_expired</strong> и <strong>/select_deleted</strong> - возвращают <code>quantity</code><br>
-                        Это позволяет видеть общее количество одинаковых позиций на складе.
+                        <strong>📊 5. Группировка товаров</strong><br>
+                        Все GET запросы возвращают сгруппированные данные с полями:<br>
+                        <code>total_quantity</code>, <code>delivery_quantity</code>, <code>deleted_quantity</code>
                     </li>
                 </ul>
             </section>
 
             <footer class="footer">
-                <p>🐾 Pet Storage API Documentation v1.1 | Разработано для управления складом зоомагазина</p>
-                <p style="margin-top: 0.5rem; font-size: 0.9rem;">Последнее обновление: 19 марта 2026</p>
+                <p>🐾 Pet Storage API Documentation v2.0 | Актуально на 19 марта 2026</p>
             </footer>
         </div>
     </div>
 
     <script>
-        // Управление навигацией
         const navToggle = document.getElementById('navToggle');
         const navContainer = document.getElementById('navContainer');
         const mainContent = document.getElementById('mainContent');
@@ -1221,50 +1176,23 @@
 
         navToggle.addEventListener('click', toggleNav);
 
-        // Закрытие навигации при клике на ссылку
         document.querySelectorAll('.nav-link, .nav-sublink').forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
                 const targetId = link.getAttribute('href');
                 if (targetId && targetId !== '#') {
-                    const targetElement = document.querySelector(targetId);
-                    if (targetElement) {
-                        targetElement.scrollIntoView({ behavior: 'smooth' });
-                    }
+                    document.querySelector(targetId)?.scrollIntoView({ behavior: 'smooth' });
                 }
                 closeNav();
             });
         });
 
-        // Закрытие навигации при клике вне её
         document.addEventListener('click', (e) => {
             if (window.innerWidth <= 768) {
                 if (!navContainer.contains(e.target) && !navToggle.contains(e.target)) {
                     closeNav();
                 }
             }
-        });
-
-        // Обновление активного пункта меню при скролле
-        window.addEventListener('scroll', () => {
-            const sections = document.querySelectorAll('section');
-            const navLinks = document.querySelectorAll('.nav-link');
-            
-            let current = '';
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop;
-                const sectionHeight = section.clientHeight;
-                if (pageYOffset >= sectionTop - 200) {
-                    current = section.getAttribute('id');
-                }
-            });
-
-            navLinks.forEach(link => {
-                link.classList.remove('active');
-                if (link.getAttribute('href') === `#${current}`) {
-                    link.classList.add('active');
-                }
-            });
         });
     </script>
 </body>
