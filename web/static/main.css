@@ -10,31 +10,77 @@ body {
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
-    justify-content: flex-start;
+    justify-content: center;
     align-items: center;
     gap: 10px;
     height: 100vh;
-    background: #f5f7fb;
+    background: #dddddd;
+    overflow: hidden; /* Предотвращает скролл body */
 }
 
+
 /* Header */
-header {
+.header {
     width: 98%;
-    height: 60px;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 14px;
+    color: white;
+    margin-top: 10px;
+    padding: 20px 30px;
+    border-radius: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    flex-shrink: 0; /* Запрещает сжатие */
+}
+.employee-info {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 10px 20px;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 500;
+}
+.employee-profile{
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     gap: 10px;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.info-label {
+    font-size: 12px;
+    opacity: 0.8;
 }
 
+.info-value {
+    font-size: 16px;
+    font-weight: 600;
+}
+.supplier-info {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 15px 25px;
+    border-radius: 15px;
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+}
 .logo {
+    font-size: 24px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.buttons-control {
     margin-left: 20px;
-    color: white;
+    color: black;
     font-weight: 600;
 }
 
@@ -48,33 +94,43 @@ header {
     border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-/* Main section */
+/* Main section - фиксированные размеры */
 section {
     display: flex;
     width: 98%;
-    height: 90%;
+    height: calc(100vh - 150px); /* Фиксированная высота с учетом header */
+    max-height: calc(100vh - 150px);
+    min-height: calc(100vh - 150px); /* Запрещает изменение высоты */
+    margin-bottom: 30px;
     flex-direction: row;
     flex-wrap: nowrap;
     justify-content: flex-start;
     align-items: center;
     gap: 10px;
+    flex-shrink: 0; /* Запрещает сжатие */
 }
 
-/* Left panel */
+/* Left panel - фиксированные размеры */
 .left-panel {
     width: 20%;
+    min-width: 20%; /* Фиксированная ширина */
+    max-width: 20%;
     height: 100%;
-    background: #212c3d41;
+    min-height: 100%; /* Фиксированная высота */
+    max-height: 100%;
+    background: #ffffff;
     border-radius: 14px;
-    overflow-y: auto;
+    overflow-y: auto; /* Скролл внутри, если нужно */
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
     justify-content: flex-start;
     align-items: center;
     gap: 10px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+
     padding: 15px 0;
+    flex-shrink: 0; /* Запрещает сжатие */
 }
 
 .left-panel > *:first-child {
@@ -93,6 +149,7 @@ button {
     justify-content: flex-start;
     transition: all 0.3s ease;
     padding-left: 15px;
+    flex-shrink: 0; /* Запрещает сжатие кнопок */
 }
 
 button:hover {
@@ -112,44 +169,55 @@ button h3 {
     transition: color 0.3s ease;
 }
 
-/* Main content area */
+/* Main content area - фиксированные размеры */
 .main {
     width: 80%;
+    min-width: 80%; /* Фиксированная ширина */
+    max-width: 80%;
     height: 100%;
+    min-height: 100%; /* Фиксированная высота */
+    max-height: 100%;
     background: transparent;
     border-radius: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #212c3d41;
+    
+    flex-shrink: 0; /* Запрещает сжатие */
 }
 
 .main-conteiner {
     width: 100%;
     height: 100%;
-    background-color: #212c3d41;
+    min-height: 100%; /* Фиксированная высота */
+    max-height: 100%;
+    background: #ffffff;
     border-radius: 14px;
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
     justify-content: flex-start;
     align-items: center;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-    overflow: hidden;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+
+    overflow: hidden; /* Скрываем все, что выходит за пределы */
 }
 
-/* Head section */
+/* Head section - фиксированная высота */
 .head {
     width: 100%;
     height: 60px;
-    border-bottom: 2px solid #e2e8f0;
+    min-height: 60px; /* Фиксированная высота */
+    max-height: 60px;
+    border-bottom: 1px solid #24242486;
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
     justify-content: space-between;
     align-items: center;
     padding: 0 20px;
-    background: #f8fafc;
+    background: #87878800;
+    flex-shrink: 0; /* Запрещает сжатие */
 }
 
 .head h3 {
@@ -161,10 +229,11 @@ button h3 {
     gap: 8px;
 }
 
-/* Control panel */
+/* Control panel - фиксированная минимальная высота */
 .control {
     width: 100%;
     min-height: 60px;
+    max-height: 60px; /* Фиксированная высота */
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
@@ -173,8 +242,9 @@ button h3 {
     gap: 10px;
     overflow-x: auto;
     padding: 10px 20px;
-    background: #f8fafc;
-    border-bottom: 1px solid #e2e8f0;
+    background: #f8fafc00;
+    border-bottom: 1px solid #24242486;
+    flex-shrink: 0; /* Запрещает сжатие */
 }
 
 .control-btn {
@@ -192,6 +262,7 @@ button h3 {
     font-weight: 500;
     color: #475569;
     white-space: nowrap;
+    flex-shrink: 0; /* Запрещает сжатие кнопок */
 }
 
 .control-btn:hover {
@@ -207,19 +278,20 @@ button h3 {
     font-size: 14px;
 }
 
-/* Items container */
+/* Items container - занимает оставшееся место с прокруткой */
 .items {
     width: 100%;
-    flex-grow: 1;
+    flex: 1 1 auto; /* Растягивается, но не сжимается меньше контента */
+    min-height: 0; /* Важно для правильной работы flex */
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
     justify-content: flex-start;
     align-items: center;
     gap: 10px;
-    overflow-y: auto;
+    overflow-y: auto; /* Прокрутка внутри, если нужно */
     padding: 20px;
-    background: #f8fafc;
+    background: #87878800;
 }
 
 /* Card styling - как в форме добавления */
@@ -238,6 +310,7 @@ button h3 {
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
     border: 1px solid #e2e8f0;
     transition: all 0.3s ease;
+    flex-shrink: 0; /* Карточки не сжимаются */
 }
 
 .card:hover {
@@ -256,6 +329,7 @@ button h3 {
     align-items: center;
     justify-content: center;
     font-size: 32px;
+    flex-shrink: 0; /* Иконка не сжимается */
 }
 
 .card-ico h1 {
@@ -273,6 +347,7 @@ button h3 {
     justify-content: center;
     align-items: flex-start;
     gap: 5px;
+    min-width: 0; /* Позволяет тексту переноситься */
 }
 
 .card-info-top, .card-info-bottom {
@@ -299,16 +374,19 @@ button h3 {
     color: #1e293b;
     border: 1px solid #e2e8f0;
     white-space: nowrap;
+    flex-shrink: 0; /* Поля не сжимаются */
 }
 
 /* Card buttons */
 .card-btns {
     width: 100px;
+    min-width: 100px; /* Фиксированная ширина */
     display: flex;
     align-items: center;
     justify-content: flex-end;
     gap: 5px;
     padding-right: 10px;
+    flex-shrink: 0; /* Блок кнопок не сжимается */
 }
 
 .card-btns button {
@@ -364,18 +442,51 @@ button h3 {
     background: #feebc8;
     color: #744210;
 }
-.panel-btn{
-  background-color: #1e293b2c;
+
+.panel-btn {
+    background: linear-gradient(135deg, #f8fafc, #ffffff);
+    border: 1px solid #BDC3C7;
+    background-color: #696a6b71;
+    color: black;
 }
+.back-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            width: auto;
+            height: auto;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateX(-3px);
+        }
 /* Responsive */
 @media (max-width: 768px) {
     section {
         flex-direction: column;
+        height: calc(100vh - 120px);
+        min-height: calc(100vh - 120px);
+        max-height: calc(100vh - 120px);
     }
     
     .left-panel {
         width: 100%;
+        min-width: 100%;
+        max-width: 100%;
         height: auto;
+        min-height: auto;
+        max-height: 30%; /* Ограничиваем высоту на мобильных */
         flex-direction: row;
         flex-wrap: wrap;
         padding: 10px;
@@ -383,10 +494,16 @@ button h3 {
     
     .left-panel button {
         width: calc(50% - 10px);
+        height: 40px;
     }
     
     .main {
         width: 100%;
+        min-width: 100%;
+        max-width: 100%;
+        height: 70%;
+        min-height: 70%;
+        max-height: 70%;
     }
     
     .card {

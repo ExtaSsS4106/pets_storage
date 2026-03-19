@@ -1,12 +1,25 @@
-<header>
-  <h2 class="logo">🐾 Pet Storage</h2>
-  <div class="profile"></div>
-</header>
+<div class="header">
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <div class="logo">
+            <span>🐾</span> Pet Storage
+        </div>
+    </div>
+    <div class="employee-profile">
+      <div id="employee-info" class="employee-info">
+          👤 Администратор: Иван Петров
+      </div>
+      <button class="back-btn" onclick="logout()">
+          Выйти
+      </button>
+    </div>
+</div>
 <section>
   <div class="left-panel">
-    <button id="storage" class="panel-btn"><h3 class="logo">📦 Склад</h3></button>
-    <button id="movment" class="panel-btn"><h3 class="logo">📊 Движения товаров</h3></button>
-    <button id="employees" class="panel-btn"><h3 class="logo">👥 Сотрудники</h3></button>
+    <button id="storage" class="panel-btn"><h3 class="buttons-control">📦 Склад</h3></button>
+    <button id="movment" class="panel-btn"><h3 class="buttons-control">📊 Движения товаров</h3></button>
+    <button id="employees" class="panel-btn"><h3 class="buttons-control">👥 Сотрудники</h3></button>
+    <button id="add_delivery" class="panel-btn"><h3 class="buttons-control">🚛 Добавить поставку</h3></button>
+    <button id="disposal" class="panel-btn"><h3 class="buttons-control">📤 Списание</h3></button>
   </div>
   <div class="main">
     <div class="main-conteiner">

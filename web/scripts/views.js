@@ -1,6 +1,12 @@
 console.log("views.js inited")
 
-
+async function logout() {
+    const userConfirmed = confirm('Вы действительно хотите выйти?');
+    if (userConfirmed) {
+        await eel.logout()();
+        loadPage(await eel.get_load_page()());
+    }
+}
 
 async function loadPage(value) {
     let content;
@@ -21,8 +27,10 @@ async function loadPage(value) {
             break;
         case "main":
             [content, data] = await eel.main()(); 
+            console.log(data);
             document.querySelector('body').innerHTML = content;
             link.href = `../static/main.css`;
+            document.getElementById('employee-info').innerText = `👤 ${data.user.position}: ${data.user.full_name}`
             let MainPage = new Main_page();
             MainPage.init_page();
             await eel.set_load_page('main')(); 
@@ -31,9 +39,18 @@ async function loadPage(value) {
             [content, data] = await eel.add_page()(); 
             document.querySelector('body').innerHTML = content;
             link.href = `../static/add.css`;
+            document.getElementById('employee-info').innerText = `👤 ${data.user.position}: ${data.user.full_name}`
             let AddPage = new Add_page();
             AddPage.init_page();
             await eel.set_load_page('add_page')(); 
+            break;
+        case "disposal":
+            [content, data] = await eel.disposal()(); 
+            document.querySelector('body').innerHTML = content;
+            link.href = `../static/disposal.css`;
+            document.getElementById('employee-info').innerText = `👤 ${data.user.position}: ${data.user.full_name}`
+            let writeoffPage = new WriteoffPage();
+            await eel.set_load_page('disposal')(); 
             break;
         default:
             console.log("nothing to show");

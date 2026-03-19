@@ -1,20 +1,17 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <div class="logo">
-                <span>🐾</span> Pet Storage
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div class="logo">
+                    <span>🐾</span> Pet Storage
+                </div>
+                <button class="back-btn" onclick="loadPage('main')">
+                    <span>←</span> На главную
+                </button>
             </div>
-            <div class="supplier-info">
-                <div class="info-item">
 
-                </div>
-                <div class="info-item">
-
-                </div>
-                <div class="info-item">
-                    <span class="info-label">Менеджер</span>
-                    <span class="info-value">Иван Петров</span>
-                </div>
+            <div id="employee-info" class="employee-info">
+                👤 Администратор: Иван Петров
             </div>
         </div>
 

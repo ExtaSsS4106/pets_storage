@@ -33,7 +33,17 @@ class Main_page {
         const storage = document.getElementById('storage');
         const movment = document.getElementById('movment');
         const employees = document.getElementById('employees');
-        
+        const add_delivery = document.getElementById('add_delivery'); 
+        const disposal = document.getElementById('disposal');
+
+        disposal.addEventListener('click', async () => {
+            loadPage('disposal');
+        });
+
+        add_delivery.addEventListener('click', async () => {
+            loadPage('add_page');
+        });
+
         storage.addEventListener('click', async () => {
             const data = await this.get_data('select_products');
             this.insert_products(data);
@@ -75,7 +85,7 @@ class Main_page {
         document.getElementById('deleted-products').addEventListener('click', async () => {
             const data = await this.get_data('select_deleted');
             this.insert_products(data);
-        });
+        }); 
         
         // Проверяем наличие ошибки
         if (data && data.error) {

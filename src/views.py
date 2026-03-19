@@ -16,7 +16,14 @@ class Views:
             data = json.load(file)
             print(data)
         return render("web/pages/main/main.html", data)
-
+    
+    @eel.expose
+    def disposal():
+        with open(USER_DATA, 'r', encoding='utf-8') as file:
+            data = json.load(file)
+            print(data)
+        return render("web/pages/main/disposal.html", data) 
+    
     @eel.expose
     def add_page():
         with open(USER_DATA, 'r', encoding='utf-8') as file:
@@ -84,7 +91,50 @@ class Views:
         except Exception as e:
             print(f"Ошибка: {e}")
             return {'error': True, 'message': str(e)}
+    @eel.expose
+    def select_active_with_ids():
+        try:
+            with open(USER_DATA, 'r', encoding='utf-8') as file:
+                data = json.load(file)
+            
+            response = requests.get(
+                url=f"{HOST}select_active_with_ids",
+                headers={
+                    'Content-Type': 'application/json',
+                    'Authorization': f'Token {data["token"]}'
+                }
+            )
+            
+            if response.status_code == 200:
+                response_data = response.json()
+                #print(response_data.get('data', []))
+                return response_data
+            else:
+                return {'error': True, 'message': f'Ошибка {response.status_code}'}
+                
+        except Exception as e:
+            print(f"Ошибка: {e}")
+            return {'error': True, 'message': str(e)}
         
+    @eel.expose
+    def change_status(P_data):
+        try:
+            with open(USER_DATA, 'r', encoding='utf-8') as file:
+                data = json.load(file)
+            
+            response = requests.post(
+                url=f"{HOST}change_status",
+                data=json.dumps(P_data),
+                headers={
+                    'Content-Type': 'application/json',
+                    'Authorization': f'Token {data["token"]}'
+                }
+            )
+            
+        except Exception as e:
+            print(f"Ошибка: {e}")
+            return {'error': True, 'message': str(e)}     
+          
     @eel.expose
     def add_products(P_data):
         try:
@@ -285,8 +335,26 @@ class Views:
             return {'error': True, 'message': str(e)}
         
         
-        
     
+    @eel.expose
+    def logout():
+        with open(USER_DATA, 'r', encoding='utf-8') as file:
+            data = json.load(file)
+        with open(CONF_PATH, 'r', encoding='utf-8') as file:
+            page = json.load(file)
+        requests.post(
+                url=f"{HOST}logout",
+                headers={
+                    'Content-Type': 'application/json',
+                    'Authorization': f'Token {data["token"]}'
+                }
+            )
+        page['load_page'] = 'login'
+        with open(CONF_PATH, 'w', encoding='utf-8') as f:
+            json.dump(page, f, indent=4, ensure_ascii=False)
+        with open(USER_DATA, 'w', encoding='utf-8') as f:
+            json.dump('', f, indent=4, ensure_ascii=False)
+        
     @eel.expose
     def login(email=None, passwd=None):
         if email and passwd:

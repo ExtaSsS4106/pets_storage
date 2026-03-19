@@ -1,0 +1,75 @@
+<div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div class="logo">
+                    <span>🐾</span> Pet Storage
+                </div>
+                <button class="back-btn" onclick="loadPage('main')">
+                    <span>←</span> На главную
+                </button>
+                <div class="logo">
+                    <span>🗑️</span> Списание товаров
+                </div>
+            </div>
+            <div id="employee-info" class="employee-info">
+                👤 Администратор: Иван Петров
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <div class="main-content">
+            <!-- Products list -->
+            <div class="products-section">
+                <div class="section-title">
+                    <span class="section-icon">📋</span>
+                    <h2>Список товаров на складе</h2>
+                </div>
+
+                <div class="search-bar">
+                    <input type="text" class="search-input" id="searchInput" placeholder="🔍 Поиск по названию или производителю...">
+                    <select class="filter-select" id="filterSelect">
+                        <option value="all">Все товары</option>
+                        <option value="exists">Активные</option>
+                        <option value="delivery">В поставке</option>
+                    </select>
+                </div>
+
+                <div class="products-grid" id="productsGrid">
+                    <!-- Products will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Selection panel -->
+            <div class="selection-panel">
+                <div class="selection-header">
+                    <span class="selection-title">Выбранные товары</span>
+                    <span class="selection-count" id="selectedCount">0</span>
+                </div>
+
+                <div class="selected-items" id="selectedItems">
+                    <!-- Selected items will appear here -->
+                </div>
+
+                <div class="summary">
+                    <div class="summary-item">
+                        <span>Выбрано позиций:</span>
+                        <span id="summaryItems">0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Всего единиц к списанию:</span>
+                        <span id="summaryQuantity">0 шт</span>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-danger" id="writeoffBtn" disabled>
+                        <span>🗑️</span> Списать выбранное
+                    </button>
+                    <button class="btn btn-secondary" id="clearBtn">
+                        <span>✕</span> Очистить
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
