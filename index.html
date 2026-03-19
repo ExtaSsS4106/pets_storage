@@ -272,6 +272,11 @@
             color: white;
         }
 
+        .badge-new {
+            background: #9b59b6;
+            color: white;
+        }
+
         .description {
             margin: 1rem 0;
             color: #475569;
@@ -528,6 +533,7 @@
                     <li class="nav-subitem"><a href="#select_expired" class="nav-sublink" onclick="closeNav()">Просроченные</a></li>
                     <li class="nav-subitem"><a href="#select_deleted" class="nav-sublink" onclick="closeNav()">Списанные</a></li>
                     <li class="nav-subitem"><a href="#select_active_with_ids" class="nav-sublink" onclick="closeNav()">Активные с ID</a></li>
+                    <li class="nav-subitem"><a href="#select_delivery_with_ids" class="nav-sublink" onclick="closeNav()">В доставке с ID</a></li>
                     <li class="nav-subitem"><a href="#add" class="nav-sublink" onclick="closeNav()">Добавить</a></li>
                     <li class="nav-subitem"><a href="#change_status" class="nav-sublink" onclick="closeNav()">Изменить статус</a></li>
                 </ul>
@@ -851,12 +857,12 @@
                     </div>
                 </div>
 
-                <!-- Активные товары с ID (НОВЫЙ МЕТОД) -->
+                <!-- Активные товары с ID -->
                 <div id="select_active_with_ids" class="endpoint">
                     <span class="method method-get">GET</span>
                     <span class="endpoint-url">/select_active_with_ids</span>
                     <span class="badge badge-auth">🔒 Требуется токен</span>
-                    <span class="new-badge">НОВЫЙ</span>
+                    <span class="badge-new">ДЛЯ СПИСАНИЯ</span>
                     <div class="description">Получить список активных товаров (Status='exists') с группировкой и массивами ID для списания</div>
 
                     <h4>✅ Успешный ответ (200):</h4>
@@ -882,6 +888,39 @@
 }</pre>
                     </div>
                     <p><strong>🔍 Особенность:</strong> Каждая группа содержит массив <code>product_ids</code> со всеми ID товаров в этой группе. Идеально для страницы списания.</p>
+                </div>
+
+                <!-- Товары в доставке с ID (НОВЫЙ МЕТОД) -->
+                <div id="select_delivery_with_ids" class="endpoint">
+                    <span class="method method-get">GET</span>
+                    <span class="endpoint-url">/select_delivery_with_ids</span>
+                    <span class="badge badge-auth">🔒 Требуется токен</span>
+                    <span class="badge-new">НОВЫЙ</span>
+                    <div class="description">Получить список товаров в доставке (Status='delivery') с группировкой и массивами ID для принятия на склад</div>
+
+                    <h4>✅ Успешный ответ (200):</h4>
+                    <div class="response-success">
+                        <pre>{
+    "data": {
+        "status": "delivery_products_with_ids",
+        "grouped_data": [
+            {
+                "name": "Корм для кошек жидкий",
+                "manufacturer": "Whiskas",
+                "category": "wet",
+                "animal_type": "cats",
+                "expiry_date": "2026-06-30",
+                "delivery_date": "2024-03-17",
+                "total_quantity": 15,
+                "product_ids": [201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215],
+                "status": "delivery"
+            }
+        ],
+        "total_count": 15
+    }
+}</pre>
+                    </div>
+                    <p><strong>📦 Применение:</strong> Используется на странице приема поставок для выборочного принятия товаров на склад.</p>
                 </div>
 
                 <!-- Добавить товары -->
@@ -944,12 +983,16 @@
                         <pre>{
     "products": [
         {
-            "id": 1,
+            "id": 101,
             "status": "deleted"
         },
         {
-            "id": 2,
+            "id": 102,
             "status": "deleted"
+        },
+        {
+            "id": 201,
+            "status": "exists"
         }
     ]
 }</pre>
@@ -981,7 +1024,7 @@
                     <div class="response-success">
                         <pre>{
     "data": {
-        "success_count": 2,
+        "success_count": 3,
         "errors_count": 0,
         "list": [],
         "status": "completed"
@@ -1045,7 +1088,9 @@
                 "p_id": 2,
                 "action": "recive",
                 "date_time": "2024-03-19T10:15:30",
-                "employee": "Иван Петров"
+                "description": null,
+                "employee": "Иван Петров",
+                "employee_email": "ivan@example.com"
             }
         ]
     }
@@ -1243,14 +1288,19 @@
                         Все GET запросы возвращают сгруппированные данные с количеством
                     </li>
                     <li style="margin-bottom: 1rem; padding: 1rem; background: #f8fafc; border-radius: 10px; border-left: 4px solid #667eea;">
-                        <strong>🆕 6. Новый метод для списания</strong><br>
-                        <code>/select_active_with_ids</code> - возвращает сгруппированные активные товары с массивами ID для удобного списания
+                        <strong>🗑️ 6. Метод для списания</strong><br>
+                        <code>/select_active_with_ids</code> - возвращает активные товары с массивами ID
+                    </li>
+                    <li style="margin-bottom: 1rem; padding: 1rem; background: #f8fafc; border-radius: 10px; border-left: 4px solid #9b59b6;">
+                        <strong>🚚 7. Новый метод для поставок</strong><br>
+                        <code>/select_delivery_with_ids</code> - возвращает товары в доставке с массивами ID для принятия на склад
                     </li>
                 </ul>
             </section>
 
             <footer class="footer">
-                <p>🐾 Pet Storage API Documentation v2.2 | Актуально на 20 марта 2026</p>
+                <p>🐾 Pet Storage API Documentation v2.3 | Актуально на 20 марта 2026</p>
+                <p>Добавлен новый эндпоинт: <code>/select_delivery_with_ids</code> для работы с поставками</p>
             </footer>
         </div>
     </div>
