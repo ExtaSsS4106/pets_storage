@@ -131,27 +131,86 @@ def add(request):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def delete(request):
+def change_status(request):
     """
-        "products":[{"id":product_id}]
+
+        "products":[{
+            "id": product_id,
+            "status": "exists|delivery|expired|deleted"
+        }]
+        
     """
     try:
         data = json.loads(request.body)
         if data:
-            products = data.get('products') #!!! must to be array
+            products = data.get('products')  # !!! must be array
             errors = []
+            success_count = 0
+            employee = Employees.objects.get(user=request.user)
+            
             for p in products:
-                if Products_in_storage.objects.filter(ID=p.get('id')).exists():
-                    product = Products_in_storage.objects.get(ID=p.get('id'))
-                    product.Status = 'deleted'
+                product_id = p.get('id')
+                new_status = p.get('status')
+                
+                if not product_id or not new_status:
+                    errors.append({
+                        "product": p,
+                        "error": "Missing id or status"
+                    })
+                    continue
+                    
+                # Проверяем допустимость статуса
+                valid_statuses = ['delivery', 'exists', 'expired', 'deleted']
+                if new_status not in valid_statuses:
+                    errors.append({
+                        "product": p,
+                        "error": f"Invalid status. Must be one of: {valid_statuses}"
+                    })
+                    continue
+                
+                if Products_in_storage.objects.filter(ID=product_id).exists():
+                    product = Products_in_storage.objects.get(ID=product_id)
+                    old_status = product.Status
+                    
+                    # Меняем статус
+                    product.Status = new_status
                     product.save()
-                    Item_Movements.objects.create(Products_in_storage_ID=product, Action='disposal', Employee_ID=Employees.objects.get(user=request.user))
+                    
+                    # Создаем движение в зависимости от нового статуса
+                    if new_status == 'deleted' and old_status != 'deleted':
+                        # Списание товара
+                        Item_Movements.objects.create(
+                            Products_in_storage_ID=product, 
+                            Action='disposal', 
+                            Employee_ID=employee
+                        )
+                    elif new_status == 'exists' and old_status == 'delivery':
+                        # Поступление товара из поставки
+                        Item_Movements.objects.create(
+                            Products_in_storage_ID=product, 
+                            Action='recive', 
+                            Employee_ID=employee
+                        )
+                    elif new_status == 'expired' and old_status != 'expired':
+                        # Товар стал просроченным
+                        Item_Movements.objects.create(
+                            Products_in_storage_ID=product, 
+                            Action='expired', 
+                            Employee_ID=employee
+                        )
+                    
+                    success_count += 1
                 else:
-                    errors.append(p)
+                    errors.append({
+                        "product": p,
+                        "error": f"Product with id {product_id} not found"
+                    })
+            
             response = {
+                "success_count": success_count,
                 "errors_count": len(errors),
                 "list": errors,
-                "status": "not added"                    
+                "status": "completed" if success_count > 0 else "failed"                    
             }
             return JsonResponse({"data": response})
         else:
@@ -160,10 +219,10 @@ def delete(request):
     except Exception as e:
         response = {
             "status": "error",
-            "error": e,
+            "error": str(e),
         }
         return JsonResponse({"data": response})
-    
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def select_all(request):
@@ -358,7 +417,70 @@ def select_deleted(request):
             "error": str(e),
         }
         return JsonResponse({"data": response})
-
+    
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def select_active_with_ids(request):
+    """
+    Возвращает список активных товаров (Status='exists') с группировкой
+    и массив всех ID каждого товара для списания
+    """
+    try:
+        # Получаем все активные товары
+        products = Products_in_storage.objects.filter(Status='exists').order_by('-Delivery_Date')
+        
+        if products.exists():
+            # Группируем товары для отображения
+            grouped_products = products.values(
+                'Name', 'Manufacturer', 'Category_ID__Type', 'Animal_Type_ID__Type', 'Expiry_Date', 'Delivery_Date', 'Status'
+            ).annotate(
+                total=Count('ID')
+            ).order_by('-Delivery_Date')
+            
+            response_data = []
+            
+            for group in grouped_products:
+                # Получаем все ID товаров в этой группе
+                product_ids = list(products.filter(
+                    Name=group['Name'],
+                    Manufacturer=group['Manufacturer'],
+                    Category_ID__Type=group['Category_ID__Type'],
+                    Animal_Type_ID__Type=group['Animal_Type_ID__Type'],
+                    Expiry_Date=group['Expiry_Date'],
+                    Delivery_Date=group['Delivery_Date']
+                ).values_list('ID', flat=True))
+                
+                response_data.append({
+                    "name": group['Name'],
+                    "manufacturer": group['Manufacturer'],
+                    "category": group['Category_ID__Type'],
+                    "animal_type": group['Animal_Type_ID__Type'],
+                    "expiry_date": group['Expiry_Date'],
+                    "delivery_date": group['Delivery_Date'],
+                    "total_quantity": group['total'],
+                    "product_ids": product_ids,  # Массив всех ID товаров в этой группе
+                    "status": group['Status']
+                })
+            
+            
+            
+            response = {
+                "status": "active_products_with_ids",
+                "grouped_data": response_data,
+                "total_count": products.count()
+            }
+            print(response)
+            return JsonResponse({"data": response})
+        else:
+            return JsonResponse({"data": "empty"})
+            
+    except Exception as e:
+        response = {
+            "status": "error",
+            "error": str(e),
+        }
+        return JsonResponse({"data": response})
+    
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def select_movment_by_action(request, action):

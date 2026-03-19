@@ -118,7 +118,7 @@ class Item_Movements(models.Model):
     )
     Action = models.CharField(
         max_length=10,
-        choices=[('disposal', 'disposal'), ('adding', 'adding')],
+        choices=[('disposal', 'disposal'), ('adding', 'adding'), ('recive', 'recive'), ('expired', 'expired')],
         db_column='Action'
     )
     Date_Time = models.DateTimeField(auto_now_add=True, db_column='Date_Time')
