@@ -90,7 +90,7 @@ class Products_in_storage(models.Model):
     Delivery_Date = models.DateField(db_column='Delivery_Date')
     Status = models.CharField(
         max_length=10,
-        choices=[('exists', 'exists'), ('expired', 'expired'), ('deleted', 'deleted')],
+        choices=[('delivery', 'delivery'), ('exists', 'exists'), ('expired', 'expired'), ('deleted', 'deleted')],
         db_column='Status',
         default='exists'
     )

@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-
+from django.db.models import Count, Q
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.response import Response
@@ -35,8 +35,8 @@ def login_api(request):
     if not user.check_password(request.data['password']):
         return Response({'detail':'wrong password'}, status=status.HTTP_404_NOT_FOUND)
     token, created=Token.objects.get_or_create(user=user)
-    
-    return Response({"token": token.key, "user":serializer.data})
+    employe = Employees.objects.get(user=user)
+    return Response({"token": token.key, "user":{"full_name": employe.Full_Name, "email": employe.Email, "position":employe.Position_ID.Type}})
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -58,7 +58,8 @@ def sign_up_api(request):
         user = serializer.create(request.data)
         login(request, user)
         token = Token.objects.create(user=user)
-        return Response({"token": token.key, "user":serializer.data})
+        employe = Employees.objects.get(user=user)
+        return Response({"token": token.key, "user":{"full_name": employe.Full_Name, "email": employe.Email, "position":employe.Position_ID.Type}})
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
@@ -81,6 +82,7 @@ def add(request):
             "animal_type_id": product_animal_type_id,
             "expiry_date": product_expiry_date,
             "delivery_date": product_delivery_date,
+            "status": delivery
         }]
     """
     if request.method == 'POST':
@@ -96,8 +98,9 @@ def add(request):
                     animal_type_id = np.get('animal_type_id')
                     expiry_date = np.get('expiry_date')
                     delivery_date = np.get('delivery_date')
-                    if name and manufacturer and category_id and animal_type_id and expiry_date and delivery_date:
-                        product = Products_in_storage.objects.create(Name=name, Manufacturer=manufacturer, Category_ID_id=category_id, Animal_Type_ID_id=animal_type_id, Expiry_Date=expiry_date, Delivery_Date=delivery_date)
+                    status_ = np.get('status')
+                    if name and manufacturer and category_id and animal_type_id and expiry_date and delivery_date and status_:
+                        product = Products_in_storage.objects.create(Name=name, Manufacturer=manufacturer, Category_ID_id=category_id, Animal_Type_ID_id=animal_type_id, Expiry_Date=expiry_date, Delivery_Date=delivery_date, Status=status_)
                         Item_Movements.objects.create(Products_in_storage_ID=product, Action='adding', Employee_ID=Employees.objects.get(user=request.user))
                     else:
                         errors.append(np)
@@ -125,6 +128,7 @@ def add(request):
             "animal_types": [{"id":animal_type.ID, "type":animal_type.Type} for animal_type in animal_types]
         }
         return JsonResponse({"data": response})
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def delete(request):
@@ -166,9 +170,35 @@ def select_all(request):
     try:
         products = Products_in_storage.objects.all().order_by('-ID')
         if products.exists():
+            # Группируем товары по названию, производителю, категории, типу животного и сроку годности
+            from django.db.models import Count
+            grouped_products = products.values(
+                'Name', 'Manufacturer', 'Category_ID__Type', 'Animal_Type_ID__Type', 'Expiry_Date', 'Delivery_Date', 'Status'
+            ).annotate(
+                total=Count('ID'),
+                delivery_count=Count('ID', filter=Q(Status='delivery')),
+                active_count=Count('ID', filter=Q(Status='exists')),
+                deleted_count=Count('ID', filter=Q(Status='deleted'))
+            ).order_by('-Delivery_Date')
+            
+            response_data = []
+            for group in grouped_products:
+                response_data.append({
+                    "name": group['Name'],
+                    "manufacturer": group['Manufacturer'],
+                    "category": group['Category_ID__Type'],
+                    "animal_type": group['Animal_Type_ID__Type'],
+                    "expiry_date": group['Expiry_Date'],
+                    "delivery_date": group['Delivery_Date'],
+                    "delivery_quantity": group['delivery_count'],
+                    "total_quantity": group['total'],
+                    "deleted_quantity": group['deleted_count'],
+                    "status": group['Status']
+                })
+            
             response = {
-                "status": "all_products",
-                "data": [{"id":p.ID, "name":p.Name, "manufacturer":p.Manufacturer, "category":p.Category_ID.Type, "animal_type": p.Animal_Type_ID.Type, "expiry_date":p.Expiry_Date, "delivery_date":p.Delivery_Date, "status":p.Status} for p in products],
+                "status": "all_products_grouped",
+                "data": response_data,
             }
             return JsonResponse({"data": response})
         else:
@@ -176,7 +206,7 @@ def select_all(request):
     except Exception as e:
         response = {
             "status": "error",
-            "error": e,
+            "error": str(e),
         }
         return JsonResponse({"data": response})
 
@@ -184,7 +214,7 @@ def select_all(request):
 @permission_classes([IsAuthenticated])
 def select_movment(request):
     try:
-        movments = Item_Movements.objects.all()
+        movments = Item_Movements.objects.all().order_by('-Date_Time')
         if movments.exists():
             response = {
                 "status": "all_movments",
@@ -196,7 +226,7 @@ def select_movment(request):
     except Exception as e:
         response = {
             "status": "error",
-            "error": e,
+            "error": str(e),
         }
         return JsonResponse({"data": response})
     
@@ -216,10 +246,9 @@ def select_employees(request):
     except Exception as e:
         response = {
             "status": "error",
-            "error": e,
+            "error": str(e),
         }
         return JsonResponse({"data": response})
-
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -233,6 +262,7 @@ def delete_employees(request):
             if User.objects.filter(id=uid).exists():
                 usr = User.objects.get(id=uid)
                 usr.delete()
+                return JsonResponse({"data": "user deleted"})
             else:
                 return JsonResponse({"data": "user not found"})
         else:
@@ -240,7 +270,7 @@ def delete_employees(request):
     except Exception as e:
         response = {
             "status": "error",
-            "error": e,
+            "error": str(e),
         }
         return JsonResponse({"data": response})
 
@@ -249,11 +279,33 @@ def delete_employees(request):
 def select_expired(request):
     try:
         from datetime import date
-        products = Products_in_storage.objects.filter(Expiry_Date__lt=date.today(), Status='exists')
+        products = Products_in_storage.objects.filter(Expiry_Date__lt=date.today())
         if products.exists():
+            # Группируем просроченные товары
+            grouped_products = products.values(
+                'Name', 'Manufacturer', 'Category_ID__Type', 'Animal_Type_ID__Type', 'Expiry_Date', 'Delivery_Date', 'Status'
+            ).annotate(
+                total=Count('ID')
+            ).order_by('Expiry_Date')
+            
+            response_data = []
+            for group in grouped_products:
+                response_data.append({
+                    "name": group['Name'],
+                    "manufacturer": group['Manufacturer'],
+                    "category": group['Category_ID__Type'],
+                    "animal_type": group['Animal_Type_ID__Type'],
+                    "expiry_date": group['Expiry_Date'],
+                    "delivery_date": group['Delivery_Date'],
+                    "delivery_quantity": 0,
+                    "total_quantity": group['total'],
+                    "deleted_quantity": 0,
+                    "status": group['Status']
+                })
+            
             response = {
-                "status": "expired_products",
-                "data": [{"id":p.ID, "name":p.Name, "manufacturer":p.Manufacturer, "category":p.Category_ID.Type, "animal_type": p.Animal_Type_ID.Type, "expiry_date":p.Expiry_Date, "delivery_date":p.Delivery_Date, "status":p.Status} for p in products],
+                "status": "expired_products_grouped",
+                "data": response_data,
             }
             return JsonResponse({"data": response})
         else:
@@ -261,7 +313,7 @@ def select_expired(request):
     except Exception as e:
         response = {
             "status": "error",
-            "error": e,
+            "error": str(e),
         }
         return JsonResponse({"data": response})
 
@@ -271,9 +323,31 @@ def select_deleted(request):
     try:
         products = Products_in_storage.objects.filter(Status='deleted')
         if products.exists():
+            # Группируем списанные товары
+            grouped_products = products.values(
+                'Name', 'Manufacturer', 'Category_ID__Type', 'Animal_Type_ID__Type', 'Expiry_Date', 'Delivery_Date', 'Status'
+            ).annotate(
+                total=Count('ID')
+            ).order_by('-Delivery_Date')
+            
+            response_data = []
+            for group in grouped_products:
+                response_data.append({
+                    "name": group['Name'],
+                    "manufacturer": group['Manufacturer'],
+                    "category": group['Category_ID__Type'],
+                    "animal_type": group['Animal_Type_ID__Type'],
+                    "expiry_date": group['Expiry_Date'],
+                    "delivery_date": group['Delivery_Date'],
+                    "delivery_quantity": 0,
+                    "active_quantity": 0,
+                    "total_quantity": group['total'],
+                    "status": "deleted"
+                })
+            
             response = {
-                "status": "deleted_products",
-                "data": [{"id":p.ID, "name":p.Name, "manufacturer":p.Manufacturer, "category":p.Category_ID.Type, "animal_type": p.Animal_Type_ID.Type, "expiry_date":p.Expiry_Date, "delivery_date":p.Delivery_Date, "status":p.Status} for p in products],
+                "status": "deleted_products_grouped",
+                "data": response_data,
             }
             return JsonResponse({"data": response})
         else:
@@ -281,7 +355,7 @@ def select_deleted(request):
     except Exception as e:
         response = {
             "status": "error",
-            "error": e,
+            "error": str(e),
         }
         return JsonResponse({"data": response})
 
@@ -289,7 +363,7 @@ def select_deleted(request):
 @permission_classes([IsAuthenticated])
 def select_movment_by_action(request, action):
     try:
-        movments = Item_Movements.objects.filter(Action=action)
+        movments = Item_Movements.objects.filter(Action=action).order_by('-Date_Time')
         if movments.exists():
             response = {
                 "status": f"{action}_movments",
@@ -301,7 +375,7 @@ def select_movment_by_action(request, action):
     except Exception as e:
         response = {
             "status": "error",
-            "error": e,
+            "error": str(e),
         }
         return JsonResponse({"data": response})
 
@@ -321,6 +395,6 @@ def select_employees_by_position(request, position_id):
     except Exception as e:
         response = {
             "status": "error",
-            "error": e,
+            "error": str(e),
         }
         return JsonResponse({"data": response})
