@@ -483,6 +483,67 @@ def select_active_with_ids(request):
     
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
+def select_delivery_with_ids(request):
+    """
+    Возвращает список товаров в доставке (Status='delivery') с группировкой
+    и массив всех ID каждого товара для принятия на склад
+    """
+    try:
+        # Получаем все товары в доставке
+        products = Products_in_storage.objects.filter(Status='delivery').order_by('-Delivery_Date')
+        
+        if products.exists():
+            # Группируем товары для отображения
+            grouped_products = products.values(
+                'Name', 'Manufacturer', 'Category_ID__Type', 'Animal_Type_ID__Type', 'Expiry_Date', 'Delivery_Date', 'Status'
+            ).annotate(
+                total=Count('ID')
+            ).order_by('-Delivery_Date')
+            
+            response_data = []
+            
+            for group in grouped_products:
+                # Получаем все ID товаров в этой группе
+                product_ids = list(products.filter(
+                    Name=group['Name'],
+                    Manufacturer=group['Manufacturer'],
+                    Category_ID__Type=group['Category_ID__Type'],
+                    Animal_Type_ID__Type=group['Animal_Type_ID__Type'],
+                    Expiry_Date=group['Expiry_Date'],
+                    Delivery_Date=group['Delivery_Date']
+                ).values_list('ID', flat=True))
+                
+                response_data.append({
+                    "name": group['Name'],
+                    "manufacturer": group['Manufacturer'],
+                    "category": group['Category_ID__Type'],
+                    "animal_type": group['Animal_Type_ID__Type'],
+                    "expiry_date": group['Expiry_Date'],
+                    "delivery_date": group['Delivery_Date'],
+                    "total_quantity": group['total'],
+                    "product_ids": product_ids,  # Массив всех ID товаров в этой группе
+                    "status": group['Status']
+                })
+            
+            response = {
+                "status": "delivery_products_with_ids",
+                "grouped_data": response_data,
+                "total_count": products.count()
+            }
+            print(response)
+            return JsonResponse({"data": response})
+        else:
+            return JsonResponse({"data": "empty"})
+            
+    except Exception as e:
+        response = {
+            "status": "error",
+            "error": str(e),
+        }
+        return JsonResponse({"data": response})   
+    
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def select_movment_by_action(request, action):
     try:
         movments = Item_Movements.objects.filter(Action=action).order_by('-Date_Time')
