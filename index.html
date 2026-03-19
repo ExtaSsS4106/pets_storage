@@ -527,6 +527,7 @@
                     <li class="nav-subitem"><a href="#select_all" class="nav-sublink" onclick="closeNav()">Все товары</a></li>
                     <li class="nav-subitem"><a href="#select_expired" class="nav-sublink" onclick="closeNav()">Просроченные</a></li>
                     <li class="nav-subitem"><a href="#select_deleted" class="nav-sublink" onclick="closeNav()">Списанные</a></li>
+                    <li class="nav-subitem"><a href="#select_active_with_ids" class="nav-sublink" onclick="closeNav()">Активные с ID</a></li>
                     <li class="nav-subitem"><a href="#add" class="nav-sublink" onclick="closeNav()">Добавить</a></li>
                     <li class="nav-subitem"><a href="#change_status" class="nav-sublink" onclick="closeNav()">Изменить статус</a></li>
                 </ul>
@@ -850,6 +851,39 @@
                     </div>
                 </div>
 
+                <!-- Активные товары с ID (НОВЫЙ МЕТОД) -->
+                <div id="select_active_with_ids" class="endpoint">
+                    <span class="method method-get">GET</span>
+                    <span class="endpoint-url">/select_active_with_ids</span>
+                    <span class="badge badge-auth">🔒 Требуется токен</span>
+                    <span class="new-badge">НОВЫЙ</span>
+                    <div class="description">Получить список активных товаров (Status='exists') с группировкой и массивами ID для списания</div>
+
+                    <h4>✅ Успешный ответ (200):</h4>
+                    <div class="response-success">
+                        <pre>{
+    "data": {
+        "status": "active_products_with_ids",
+        "grouped_data": [
+            {
+                "name": "Корм для кошек жидкий",
+                "manufacturer": "Whiskas",
+                "category": "wet",
+                "animal_type": "cats",
+                "expiry_date": "2026-06-30",
+                "delivery_date": "2024-03-17",
+                "total_quantity": 15,
+                "product_ids": [101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115],
+                "status": "exists"
+            }
+        ],
+        "total_count": 15
+    }
+}</pre>
+                    </div>
+                    <p><strong>🔍 Особенность:</strong> Каждая группа содержит массив <code>product_ids</code> со всеми ID товаров в этой группе. Идеально для страницы списания.</p>
+                </div>
+
                 <!-- Добавить товары -->
                 <div id="add" class="endpoint">
                     <span class="method method-post">POST</span>
@@ -898,12 +932,12 @@
                     </div>
                 </div>
 
-                <!-- Изменить статус товаров (НОВЫЙ УНИВЕРСАЛЬНЫЙ МЕТОД) -->
+                <!-- Изменить статус товаров -->
                 <div id="change_status" class="endpoint">
                     <span class="method method-post">POST</span>
                     <span class="endpoint-url">/change_status</span>
                     <span class="badge badge-auth">🔒 Требуется токен</span>
-                    <span class="new-badge">НОВЫЙ</span>
+                    <span class="new-badge">УНИВЕРСАЛЬНЫЙ</span>
                     <div class="description">Универсальный метод для изменения статуса товаров. Автоматически создает записи в движениях.</div>
 
                     <div class="request-box">
@@ -911,15 +945,11 @@
     "products": [
         {
             "id": 1,
-            "status": "exists"
+            "status": "deleted"
         },
         {
             "id": 2,
             "status": "deleted"
-        },
-        {
-            "id": 3,
-            "status": "expired"
         }
     ]
 }</pre>
@@ -951,26 +981,9 @@
                     <div class="response-success">
                         <pre>{
     "data": {
-        "success_count": 3,
+        "success_count": 2,
         "errors_count": 0,
         "list": [],
-        "status": "completed"
-    }
-}</pre>
-                    </div>
-
-                    <h4>❌ Пример ошибки:</h4>
-                    <div class="response-error">
-                        <pre>{
-    "data": {
-        "success_count": 2,
-        "errors_count": 1,
-        "list": [
-            {
-                "product": {"id": 999, "status": "exists"},
-                "error": "Product with id 999 not found"
-            }
-        ],
         "status": "completed"
     }
 }</pre>
@@ -978,7 +991,7 @@
                 </div>
             </section>
 
-            <!-- Движения товаров (ОБНОВЛЕНО) -->
+            <!-- Движения товаров -->
             <section id="movements" class="section">
                 <div class="section-title">
                     <span class="section-icon">📊</span>
@@ -1033,15 +1046,6 @@
                 "action": "recive",
                 "date_time": "2024-03-19T10:15:30",
                 "employee": "Иван Петров"
-            },
-            {
-                "id": 3,
-                "name": "Лакомство для кошек",
-                "manufacturer": "Whiskas",
-                "p_id": 3,
-                "action": "expired",
-                "date_time": "2024-03-19T14:20:00",
-                "employee": "Иван Петров"
             }
         ]
     }
@@ -1061,7 +1065,7 @@
                     <ul style="margin-bottom: 1rem;">
                         <li><code>/select_movment/adding</code> - добавления</li>
                         <li><code>/select_movment/disposal</code> - списания</li>
-                        <li><code>/select_movment/recive</code> - поступления из поставок</li>
+                        <li><code>/select_movment/recive</code> - поступления</li>
                         <li><code>/select_movment/expired</code> - просрочки</li>
                     </ul>
 
@@ -1069,15 +1073,15 @@
                     <div class="response-success">
                         <pre>{
     "data": {
-        "status": "recive_movments",
+        "status": "disposal_movments",
         "data": [
             {
-                "id": 2,
-                "name": "Корм для собак",
-                "manufacturer": "Purina",
-                "p_id": 2,
-                "action": "recive",
-                "date_time": "2024-03-19T10:15:30",
+                "id": 3,
+                "name": "Просроченный корм",
+                "manufacturer": "Unknown",
+                "p_id": 3,
+                "action": "disposal",
+                "date_time": "2024-03-19T14:20:00",
                 "employee": "Иван Петров"
             }
         ]
@@ -1224,9 +1228,9 @@
                         • <span style="color: #ffd700;">delivery</span> - в поставке
                     </li>
                     <li style="margin-bottom: 1rem; padding: 1rem; background: #f8fafc; border-radius: 10px;">
-                        <strong>📋 3. Действия движений (ОБНОВЛЕНО)</strong><br>
-                        • <strong>adding</strong> - добавление товара<br>
-                        • <strong>disposal</strong> - списание товара<br>
+                        <strong>📋 3. Действия движений</strong><br>
+                        • <strong>adding</strong> - добавление<br>
+                        • <strong>disposal</strong> - списание<br>
                         • <strong>recive</strong> - поступление из поставки<br>
                         • <strong>expired</strong> - просрочка
                     </li>
@@ -1236,18 +1240,17 @@
                     </li>
                     <li style="margin-bottom: 1rem; padding: 1rem; background: #f8fafc; border-radius: 10px; border-left: 4px solid #49cc90;">
                         <strong>📊 5. Группировка товаров</strong><br>
-                        Все GET запросы возвращают сгруппированные данные с полями:<br>
-                        <code>total_quantity</code>, <code>delivery_quantity</code>, <code>deleted_quantity</code>
+                        Все GET запросы возвращают сгруппированные данные с количеством
                     </li>
                     <li style="margin-bottom: 1rem; padding: 1rem; background: #f8fafc; border-radius: 10px; border-left: 4px solid #667eea;">
-                        <strong>🆕 6. Новый универсальный метод</strong><br>
-                        <code>/change_status</code> - позволяет изменять статус товаров и автоматически создает соответствующие записи в движениях
+                        <strong>🆕 6. Новый метод для списания</strong><br>
+                        <code>/select_active_with_ids</code> - возвращает сгруппированные активные товары с массивами ID для удобного списания
                     </li>
                 </ul>
             </section>
 
             <footer class="footer">
-                <p>🐾 Pet Storage API Documentation v2.1 | Актуально на 19 марта 2026</p>
+                <p>🐾 Pet Storage API Documentation v2.2 | Актуально на 20 марта 2026</p>
             </footer>
         </div>
     </div>
@@ -1290,7 +1293,6 @@
             }
         });
 
-        // Обновление активного пункта меню при скролле
         window.addEventListener('scroll', () => {
             const sections = document.querySelectorAll('section');
             const navLinks = document.querySelectorAll('.nav-link');
