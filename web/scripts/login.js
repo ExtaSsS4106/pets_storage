@@ -1,19 +1,23 @@
 class Login_page {
     get_data() {
-        const username = document.getElementById('username')?.value || '';
+        const email = document.getElementById('email')?.value || '';
         const password = document.getElementById('password')?.value || '';
         
-        return { username, password };
+        return { email, password };
     }
 
-    init_page() {
-        const btn = document.getElementById('submit-btn');
-        
-        btn.addEventListener('click', () => {
+    async init_page() {
+        const btn = document.getElementById('login-btn');
+        btn.addEventListener('click', async () => {
             const data = this.get_data();
-            const response = eel.login(data.username, data.password)();
-            if (response){
-                loadPage("main");
+            try {
+                const response = await eel.login(data.email, data.password)();
+                console.error(response);
+                if (response.status === "200") {
+                    loadPage("main");
+                }
+            } catch (error) {
+                console.error("Ошибка входа:", error);
             }
         });
     }

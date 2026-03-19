@@ -4,17 +4,13 @@ console.log("views.js inited")
 
 async function loadPage(value) {
     let content;
-    let data;
+    const link = document.querySelector('link[rel="stylesheet"]');
     switch(value) {
-        case "homepage":
-            console.log("homepage")
-            content = await eel.start_page()();
-            document.querySelector('body').innerHTML = content;
-            break;
         case "login":
             let loginPage = new Login_page();
             content = await eel.login()();
             document.querySelector('body').innerHTML = content;
+            link.href = `../static/login.css`;
             loginPage.init_page();
             break;
         case "register":
@@ -26,19 +22,18 @@ async function loadPage(value) {
         case "main":
             [content, data] = await eel.main()(); 
             document.querySelector('body').innerHTML = content;
-            set_user_name(data)
-            start_main_page();
-            
+            link.href = `../static/main.css`;
+            let MainPage = new Main_page();
+            MainPage.init_page();
+            await eel.set_load_page('main')(); 
             break;
-        case "createChannel":
-            content= await eel.create_channel()(); 
+        case "add_page":
+            [content, data] = await eel.add_page()(); 
             document.querySelector('body').innerHTML = content;
-            displayFriendsForCCpage();
-            break;
-        case "addFriends":
-            content= await eel.add_friends()(); 
-            document.querySelector('body').innerHTML = content;
-            all_users_()
+            link.href = `../static/add.css`;
+            let AddPage = new Add_page();
+            AddPage.init_page();
+            await eel.set_load_page('add_page')(); 
             break;
         default:
             console.log("nothing to show");

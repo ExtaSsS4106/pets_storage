@@ -9,104 +9,58 @@ class Views:
     def GET_HOST():
         return HOST
     
-    @eel.expose
-    def start_page():
-        return render("web/pages/registration/homepage.html")
     
     @eel.expose
     def main():
-        with open('data.json', 'r', encoding='utf-8') as file:
+        with open(USER_DATA, 'r', encoding='utf-8') as file:
             data = json.load(file)
             print(data)
         return render("web/pages/main/main.html", data)
-    
-    @eel.expose
-    def add_friends():
-        return render("web/pages/main/add-friend.html")
-    
-    @eel.expose
-    def create_channel():
-        return render("web/pages/main/create-channel.html")
-    
-    
-    
-    
-    
-    
-    @eel.expose
-    def send_friend_request(id):
-        try:
-            with open('data.json', 'r', encoding='utf-8') as file:
-                data = json.load(file)
-            
-            response = requests.post(
-                url=f"{HOST}send_friend_request",
-                headers={
-                    'Content-Type': 'application/json',
-                    'Authorization': f'Token {data["token"]}'
-                },
-                data=json.dumps({
-                    "user_id": id,
-                })
-            )
-            
 
-        except Exception as e:
-            print(f"Ошибка: {e}")
-            return render(data={'error': True, 'message': str(e)})
-        
     @eel.expose
-    def remove_friend_api(user_id):
-        try:
-            with open('data.json', 'r', encoding='utf-8') as file:
-                data = json.load(file)
-            
-            response = requests.post(
-                url=f"{HOST}remove_friend_api",
-                headers={
-                    'Content-Type': 'application/json',
-                    'Authorization': f'Token {data["token"]}'
-                },
-                data=json.dumps({
-                    "user_id": user_id,
-                })
-            )
-            
+    def add_page():
+        with open(USER_DATA, 'r', encoding='utf-8') as file:
+            data = json.load(file)
+            print(data)
+        return render("web/pages/main/add.html", data) 
 
-        except Exception as e:
-            print(f"Ошибка: {e}")
-            return render(data={'error': True, 'message': str(e)})
-    
-    
-    
     @eel.expose
-    def select_chats():
+    def get_load_page():
         try:
-            with open('data.json', 'r', encoding='utf-8') as file:
+            with open(CONF_PATH, 'r', encoding='utf-8') as file:
                 data = json.load(file)
-            
-            response = requests.get(
-                url=f"{HOST}select_chats",
-                headers={
-                    'Content-Type': 'application/json',
-                    'Authorization': f'Token {data["token"]}'
-                }
-            )
-            
-            
-            response_data = response.json()
-            print(response_data.get('users_chats', []))
-            return response_data.get('users_chats', [])
-            
-                
+            return data['load_page']
         except Exception as e:
-            print(f"Ошибка: {e}")
-            return render(data={'error': True, 'message': str(e)})
+            print(f"[ERROR]: {e}")
+            
+            
+    @eel.expose
+    def set_load_page(value='login'):
+        try:
+            with open(CONF_PATH, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                    
+                # Изменяем
+                data['load_page'] = value
+                    
+            # Записываем
+            with open(CONF_PATH, 'w', encoding='utf-8') as f:
+                json.dump(data, f, indent=4, ensure_ascii=False)
+                    
+            return True
+        except Exception as e:
+            print(f"[ERROR]: {e}")
+            
+    
+    
+    
+    
+    
     
     @eel.expose
     def select_products():
         try:
-            with open('data.json', 'r', encoding='utf-8') as file:
+            with open(USER_DATA, 'r', encoding='utf-8') as file:
                 data = json.load(file)
             
             response = requests.get(
@@ -119,32 +73,228 @@ class Views:
             
             if response.status_code == 200:
                 response_data = response.json()
-                print(response_data.get('data', []))
-                return response_data['data']['data']
+                #print(response_data.get('data', []))
+                if not response_data['data'] == 'empty':
+                    return response_data['data']['data']
+                else:
+                    return response_data['data']
             else:
-                return render(data={'error': True, 'message': f'Ошибка {response.status_code}'})
+                return {'error': True, 'message': f'Ошибка {response.status_code}'}
                 
         except Exception as e:
             print(f"Ошибка: {e}")
-            return render(data={'error': True, 'message': str(e)})
+            return {'error': True, 'message': str(e)}
         
+    @eel.expose
+    def add_products(P_data):
+        try:
+            with open(USER_DATA, 'r', encoding='utf-8') as file:
+                data = json.load(file)
+            
+            response = requests.post(
+                url=f"{HOST}add",
+                data=json.dumps(P_data),
+                headers={
+                    'Content-Type': 'application/json',
+                    'Authorization': f'Token {data["token"]}'
+                }
+            )
+            
+            if response.status_code == 200:
+                response_data = response.json()
+                #print(response_data.get('data', []))
+                if not response_data['data'] == 'empty':
+                    return response_data['data']['data']
+                else:
+                    return response_data['data']
+            else:
+                return {'error': True, 'message': f'Ошибка {response.status_code}'}
+                
+        except Exception as e:
+            print(f"Ошибка: {e}")
+            return {'error': True, 'message': str(e)}
         
+    @eel.expose
+    def select_movment():
+        try:
+            with open(USER_DATA, 'r', encoding='utf-8') as file:
+                data = json.load(file)
+            
+            response = requests.get(
+                url=f"{HOST}select_movment",
+                headers={
+                    'Content-Type': 'application/json',
+                    'Authorization': f'Token {data["token"]}'
+                }
+            )
+            
+            if response.status_code == 200:
+                response_data = response.json()
+                #print(response_data.get('data', []))
+                if not response_data['data'] == 'empty':
+                    return response_data['data']['data']
+                else:
+                    return response_data['data']
+            else:
+                return {'error': True, 'message': f'Ошибка {response.status_code}'}
+                
+        except Exception as e:
+            print(f"Ошибка: {e}")
+            return {'error': True, 'message': str(e)}
 
         
+    @eel.expose
+    def select_employees():
+        try:
+            with open(USER_DATA, 'r', encoding='utf-8') as file:
+                data = json.load(file)
+            
+            response = requests.get(
+                url=f"{HOST}select_employees",
+                headers={
+                    'Content-Type': 'application/json',
+                    'Authorization': f'Token {data["token"]}'
+                }
+            )
+            
+            if response.status_code == 200:
+                response_data = response.json()
+                print(response_data.get('data', []))
+                if not response_data['data'] == 'empty':
+                    return response_data['data']['data']
+                else:
+                    return response_data['data']
+            else:
+                return {'error': True, 'message': f'Ошибка {response.status_code}'}
+                
+        except Exception as e:
+            print(f"Ошибка: {e}")
+            return {'error': True, 'message': str(e)}
 
 
+    @eel.expose
+    def select_expired():
+        try:
+            with open(USER_DATA, 'r', encoding='utf-8') as file:
+                data = json.load(file)
+            
+            response = requests.get(
+                url=f"{HOST}select_expired",
+                headers={
+                    'Content-Type': 'application/json',
+                    'Authorization': f'Token {data["token"]}'
+                }
+            )
+            print(response.status_code)
+            if response.status_code == 200:
+                response_data = response.json()
+                print(response_data)
+                if not response_data['data'] == 'empty':
+                    return response_data['data']['data']
+                else:
+                    return response_data['data']
+            else:
+                return {'error': True, 'message': f'Ошибка {response.status_code}'}
+                
+        except Exception as e:
+            print(f"Ошибка: {e}")
+            return {'error': True, 'message': str(e)}
+
+
+    @eel.expose
+    def select_deleted():
+        try:
+            with open(USER_DATA, 'r', encoding='utf-8') as file:
+                data = json.load(file)
+            
+            response = requests.get(
+                url=f"{HOST}select_deleted",
+                headers={
+                    'Content-Type': 'application/json',
+                    'Authorization': f'Token {data["token"]}'
+                }
+            )
+            
+            if response.status_code == 200:
+                response_data = response.json()
+                if not response_data['data'] == 'empty':
+                    return response_data['data']['data']
+                else:
+                    return response_data['data']
+            else:
+                return {'error': True, 'message': f'Ошибка {response.status_code}'}
+                
+        except Exception as e:
+            print(f"Ошибка: {e}")
+            return {'error': True, 'message': str(e)}
+
+
+    @eel.expose
+    def select_movment_by_action(action):
+        try:
+            with open(USER_DATA, 'r', encoding='utf-8') as file:
+                data = json.load(file)
+            
+            response = requests.get(
+                url=f"{HOST}select_movment/{action}",
+                headers={
+                    'Content-Type': 'application/json',
+                    'Authorization': f'Token {data["token"]}'
+                }
+            )
+            
+            if response.status_code == 200:
+                response_data = response.json()
+                if not response_data['data'] == 'empty':
+                    return response_data['data']['data']
+                else:
+                    return response_data['data']
+            else:
+                return {'error': True, 'message': f'Ошибка {response.status_code}'}
+                
+        except Exception as e:
+            print(f"Ошибка: {e}")
+            return {'error': True, 'message': str(e)}
+
+
+    @eel.expose
+    def select_employees_by_position(position_id):
+        try:
+            with open(USER_DATA, 'r', encoding='utf-8') as file:
+                data = json.load(file)
+            
+            response = requests.get(
+                url=f"{HOST}select_employees/{position_id}",
+                headers={
+                    'Content-Type': 'application/json',
+                    'Authorization': f'Token {data["token"]}'
+                }
+            )
+            print(response.status_code)
+            if response.status_code == 200:
+                response_data = response.json()
+                if not response_data['data'] == 'empty':
+                    return response_data['data']['data']
+                else:
+                    return response_data['data']
+            else:
+                return {'error': True, 'message': f'Ошибка {response.status_code}'}
+                
+        except Exception as e:
+            print(f"Ошибка: {e}")
+            return {'error': True, 'message': str(e)}
         
         
         
     
     @eel.expose
-    def login(username=None, passwd=None):
-        if username and passwd:
-            print(username, passwd)
+    def login(email=None, passwd=None):
+        if email and passwd:
+            print(email, passwd)
             r = requests.post(
                     url=f"{HOST}login",
                     data=json.dumps({ 
-                        "username": username,
+                        "email": email,
                         "password": passwd
                     }),
                     headers={
@@ -152,12 +302,11 @@ class Views:
                     }
                 )
             print(r.status_code)
-            print(r.json())
             if r.status_code == 200:
-                with open("data.json", "w", encoding="utf-8") as f:
+                with open(USER_DATA, "w", encoding="utf-8") as f:
                     json.dump(r.json(), f, indent=4, ensure_ascii=False)
-                return True
-            return False
+                return {'status': str(r.status_code)}
+            return {'status': str(r.status_code)}
         else:
             return render("web/pages/registration/login.html")
     
@@ -181,16 +330,8 @@ class Views:
             print(r.status_code)
             print(r.json())
             if r.status_code == 200:
-                with open("data.json", "w", encoding="utf-8") as f:
+                with open(USER_DATA, "w", encoding="utf-8") as f:
                     json.dump(r.json(), f, indent=4, ensure_ascii=False)
                 return True
         else:
             return render("web/pages/registration/register.html")
-        
-        
-        
-    
-
-
-
-    
