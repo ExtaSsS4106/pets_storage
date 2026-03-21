@@ -9,6 +9,7 @@
 </div>
 
 ---
+https://docs.google.com/presentation/d/13hw2VfCOmLfRRJYo6qFElBNsbLrkH0lzGf70umRdiD0/edit?slide=id.g3d16f69436f_0_97#slide=id.g3d16f69436f_0_97
 
 ## 🔗 Прямая ссылка
 
